@@ -1,4 +1,4 @@
-import os, time, requests, logging, logging.handlers, json, sys
+import os, time, requests, logging, logging.handlers, json, sys, re
 from colorlog import ColoredFormatter
 import configparser
 
@@ -130,8 +130,15 @@ def add_movie(title, year):
 def get_imdb_id(title,year):
 	headers = {"Content-type": "application/json", 'Accept':'application/json'}
 	r = requests.get("http://www.omdbapi.com/?t={}&y={}&apikey=43a1c303".format(title,year), headers=headers)
-	if r.status_code == 200: return json.loads(r.text).get('imdbID')
-	else: return None
+	d = json.loads(r.text)
+	if r.status_code == 200: 
+		if d.get('Response') == "False":
+			return None
+		else:
+			log.debug(title + " " + d.get('imdbID'))
+			return d.get('imdbID')
+	else: 
+		return None
 
 def movie_download(imdbid):
 	
@@ -179,11 +186,13 @@ def main():
 			for x in f1:
 				movies_count +=1
 				title, year = x.split(',', 1)
+				if "(" or ")" in title: title = re.sub('[(&)]','', title)
 				year = year.rstrip()
 				add_movie(title, year)
 
 		except Exception as e:
 				log.error(e)
+				exit()
 		log.info("Added {} of {} Movies".format(movies_count,count))
 
 if __name__ == "__main__":

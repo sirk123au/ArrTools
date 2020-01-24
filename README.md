@@ -16,9 +16,11 @@ when you run it use
 ```
 $python radarr_add_from_list.py movielist.txt
 ```
-which you add to the top of the radarr_add_from_list where it says config
+Rename config_example.ini and add your details
+
 ```
-api_key = 'Radarr Api Key'
-baseurl = 'Radarr Base Url'
-rootfolderpath = 'Movie Root Path'
+api_key = Radarr Api Key
+baseurl = Radarr Base Url
+rootfolderpath = Movie Root Path
+searchForMovie = Enable forced search
 ```
