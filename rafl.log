@@ -1,0 +1,16 @@
+2020-01-24 09:47:18,429 [INFO ]  Found 1794 Movies... :)
+2020-01-24 09:47:18,434 [DEBUG]  Starting new HTTP connection (1): www.omdbapi.com:80
+2020-01-24 09:47:18,735 [DEBUG]  http://www.omdbapi.com:80 "GET /?t=9&y=2009&apikey=43a1c303 HTTP/1.1" 200 None
+2020-01-24 09:47:18,738 [ERROR]  Invalid URL '/api/movie/lookup/imdb?imdbId=tt0472033&apikey=': No schema supplied. Perhaps you meant http:///api/movie/lookup/imdb?imdbId=tt0472033&apikey=?
+2020-01-24 09:47:18,738 [INFO ]  Added 1 of 1794 Movies
+2020-01-24 09:48:46,749 [INFO ]  Found 1794 Movies... :)
+2020-01-24 09:48:46,753 [DEBUG]  Starting new HTTP connection (1): www.omdbapi.com:80
+2020-01-24 09:48:46,776 [DEBUG]  http://www.omdbapi.com:80 "GET /?t=9&y=2009&apikey=43a1c303 HTTP/1.1" 200 None
+2020-01-24 09:48:46,783 [ERROR]  Invalid URL '/api/movie/lookup/imdb?imdbId=tt0472033&apikey=': No schema supplied. Perhaps you meant http:///api/movie/lookup/imdb?imdbId=tt0472033&apikey=?
+2020-01-24 09:48:46,783 [INFO ]  Added 1 of 1794 Movies
+2020-01-24 09:49:46,185 [INFO ]  Found 1794 Movies... :)
+2020-01-24 09:49:46,188 [DEBUG]  Starting new HTTP connection (1): www.omdbapi.com:80
+2020-01-24 09:49:46,469 [DEBUG]  http://www.omdbapi.com:80 "GET /?t=9&y=2009&apikey=43a1c303 HTTP/1.1" 200 None
+2020-01-24 09:49:46,470 [INFO ]  9 2009
+2020-01-24 09:49:46,471 [ERROR]  Invalid URL '/api/movie/lookup/imdb?imdbId=tt0472033&apikey=': No schema supplied. Perhaps you meant http:///api/movie/lookup/imdb?imdbId=tt0472033&apikey=?
+2020-01-24 09:49:46,471 [INFO ]  Added 1 of 1794 Movies
