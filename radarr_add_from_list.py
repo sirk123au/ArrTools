@@ -1,10 +1,11 @@
 import os, time, requests, logging, logging.handlers, json, sys
 from colorlog import ColoredFormatter
-from config import ConfigParser
+import configparser
 
 # Config ###############################################################################################################
 
-config = ConfigParser('./config.yml')
+config = configparser.ConfigParser()
+config.read('./config.ini')
 baseurl = config['radarr']['baseurl']
 api_key = config['radarr']['api_key']
 rootfolderpath = config['radarr']['rootfolderpath']
@@ -47,7 +48,6 @@ log = logging.getLogger("app." + __name__)
 
 def add_movie(title, year):
 	imdbid = get_imdb_id(title,year)
-	log.info("{} {}".format(title,year))
 	headers = {"Content-type": "application/json", 'Accept':'application/json'}
 	url = "{}/api/movie/lookup/imdb?imdbId={}&apikey={}".format(baseurl, imdbid, api_key)
 	rsp = requests.get(url, headers=headers)

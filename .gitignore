@@ -1,2 +1,3 @@
 syntax: glob
-config.yml
+config.ini
+rafl.log
