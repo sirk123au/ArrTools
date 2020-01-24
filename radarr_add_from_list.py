@@ -3,9 +3,9 @@ from colorlog import ColoredFormatter
 
 # Config ###############################################################################################################
 
-api_key = 'a6db7a0ddf18311f7b97d78ee6d8806ff'
-baseurl = 'http://cloud.kdata.net.au/radarr'
-rootfolderpath = '/home/hd15/sirk123au/mnt/gdrive/Media/Movies/'
+api_key = ''
+baseurl = ''
+rootfolderpath = ''
 searchForMovie = "False"
 
 # Logging ##############################################################################################################
