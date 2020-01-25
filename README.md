@@ -14,7 +14,7 @@ Stakeout,1987
 ```
 when you run it use
 ```
-$python radarr_add_from_list.py movielist.txt
+$python3 radarr_add_from_list.py movielist.txt
 ```
 Rename config_example.ini and add your details
 
@@ -25,12 +25,12 @@ rootfolderpath = Movie Root Path
 searchForMovie = Enable forced search
 qualityProfileId = 
 ```
-
-; Standard Profile ID
-; 1 Any
-; 2 SD
-; 3 HD-720p
-; 4 HD-1080p
-; 5 Ultra-HD
-; 6 HD - 720p/1080p
-
+```
+Standard Profile ID
+1 Any
+2 SD
+3 HD-720p
+4 HD-1080p
+5 Ultra-HD
+6 HD - 720p/1080p
+```
