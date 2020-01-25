@@ -132,7 +132,7 @@ def add_movie(title, year):
 				"images": images,
 				"addOptions" : {"searchForMovie" : searchForMovie}
 				})
-					# Add Movie To Radarr
+			# Add Movie To Radarr
 			headers = {"Content-type": "application/json", 'Accept':'application/json', "X-Api-Key": api_key}
 			url = '{}/api/movie'.format(baseurl)
 			rsp = requests.post(url, headers=headers, data=Rdata)
@@ -141,11 +141,14 @@ def add_movie(title, year):
 					log.info("\u001b[36mtm{}\t     \u001b[0m{} ({}) \u001b[32mAdded to Radarr :) \u001b[36;1mNow Searching.\u001b[0m".format(tmdbid,title,year))
 				else:
 					log.info("\u001b[36mtm{}\t     \u001b[0m{} ({}) \u001b[32mAdded to Radarr :) \u001b[31mSearch Disabled.\u001b[0m".format(tmdbid,title,year))
+			elif rsp.status_code == 400:
+				log.info("\u001b[36mtm{}\t     \u001b[0m{} ({}) already Exists in Radarr.".format(tmdbid,title,year))
+				return
 		else:
 			log.error("\u001b[35m{}\t {} ({}) Not found, Not added to Radarr.\u001b[0m".format(imdbid,title,year))
 			return
 	else:
-		if imdbid == None: imdbid = "tt0000000"
+		# if imdbid == None: imdbid = "tt0000000"
 		log.info("\u001b[36m{}\t \u001b[0m{} ({}) already Exists in Radarr.".format(imdbid,title,year))
 		return
 
