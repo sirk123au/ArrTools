@@ -72,7 +72,7 @@ def add_movie(title, year):
 		url = "{}/api/movie/lookup/imdb?imdbId={}&apikey={}".format(baseurl, imdbid, api_key)
 		rsp = requests.get(url, headers=headers)
 		if len(rsp.text)==0: 
-			log.error("\u001b[35mSorry. We couldn't find any movies matching {}\u001b[0m".format(title))
+			log.error("\u001b[35mSorry. We couldn't find any movies matching {} ({})\u001b[0m".format(title,year))
 			return 
 		if rsp.status_code == 200:
 			data = json.loads(rsp.text)
@@ -112,7 +112,7 @@ def add_movie(title, year):
 		rsp = requests.get(url, headers=headers)
 		data = json.loads(rsp.text)
 		if rsp.text =="[]":
-			log.error("\u001b[35mSorry. We couldn't find any movies matching {}\u001b[0m".format(title))
+			log.error("\u001b[35mSorry. We couldn't find any movies matching {} ({})\u001b[0m".format(title,year))
 			return 
 		if rsp.status_code == 200:
 			tmdbid = data[0]["tmdbId"]
