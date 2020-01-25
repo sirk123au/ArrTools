@@ -23,4 +23,14 @@ api_key = Radarr Api Key
 baseurl = Radarr Base Url
 rootfolderpath = Movie Root Path
 searchForMovie = Enable forced search
+qualityProfileId = 
 ```
+
+; Standard Profile ID
+; 1 Any
+; 2 SD
+; 3 HD-720p
+; 4 HD-1080p
+; 5 Ultra-HD
+; 6 HD - 720p/1080p
+
