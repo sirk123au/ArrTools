@@ -1,16 +1,14 @@
 # Add Movies from a csv formatted file
 
-Add Movies to radarr from a csv list
-
-The input list file has to have the format. It has to have MovieName,Year or it won't match correctly.
+The input list file has to have the format. It has to have MovieName,Year,imdbid(Optional Makes it easer to find movie)
 ```
-The Matrix,1999
-The King,2005
-Michael Clayton,2007
-Fletch,1985
-Roxanne,1987
-Kingpin,1996
-Stakeout,1987
+Ben-Hur,1959,tt0052618
+Gone with the Wind,1939,tt0031381
+Vreme na nasilie,1988,tt0096403
+
+# OR without imdbid #
+The English Patient,1996
+Schindler's List,1993
 ```
 when you run it use
 ```

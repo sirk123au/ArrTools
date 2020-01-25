@@ -47,21 +47,21 @@ log = logging.getLogger("app." + __name__)
 
 ########################################################################################################################
 
-def add_movie(title, year):
-
-	# Get Movie imdbid 
-	headers = {"Content-type": "application/json", 'Accept':'application/json'}
-	r = requests.get("https://www.omdbapi.com/?t={}&y={}&apikey={}".format(title,year,omdbapi_key), headers=headers)
-	if r.status_code == 401:
-		log.error("omdbapi Request limit reached!")
-	d = json.loads(r.text)
-	if r.status_code == 200: 
-		if d.get('Response') == "False": 
-			imdbid =  None
+def add_movie(title, year, imdbid):
+	if imdbid =="":
+		# Get Movie imdbid 
+		headers = {"Content-type": "application/json", 'Accept':'application/json'}
+		r = requests.get("https://www.omdbapi.com/?t={}&y={}&apikey={}".format(title,year,omdbapi_key), headers=headers)
+		if r.status_code == 401:
+			log.error("omdbapi Request limit reached!")
+		d = json.loads(r.text)
+		if r.status_code == 200: 
+			if d.get('Response') == "False": 
+				imdbid =  None
+			else: 
+				imdbid = d.get('imdbID')
 		else: 
-			imdbid = d.get('imdbID')
-	else: 
-		imdbid = None
+			imdbid = None
 
 	# Store Radarr Server imdbid for faster matching
 	movieIds = []
@@ -96,7 +96,9 @@ def add_movie(title, year):
 		elif rsp.status_code == 404:
 			log.error("\u001b[36m{}\t \u001b[0m{} ({}) Not found, Not added to Radarr.".format(imdbid,title,year))
 			return
-		
+		else:
+			log.error("Something else has happend.")
+			return
 		# Add Movie To Radarr
 		headers = {"Content-type": "application/json", 'Accept':'application/json', "X-Api-Key": api_key}
 		url = '{}/api/movie'.format(baseurl)
@@ -178,13 +180,19 @@ def main():
 			RadarrData = json.loads(rsp.text)
 			for x in f1:
 				movies_count +=1
-				title, year = x.split(',', 1)
+				try:
+					title, year, imdbid = x.split(',')
+				except:
+					title, year = x.split(',')
+					imdbid = ""
+				
 				if "(" or ")" in title: title = re.sub('[(&)]','', title)
 				year = year.rstrip()
-				add_movie(title, year)
+				imdbid = imdbid.rstrip()
+				add_movie(title, year,imdbid)
 
 		except Exception as e:
-				log.error(e, exc_info=True)
+				log.error(e)
 				sys.exit(-1)
 		log.info("Added {} of {} Movies".format(movies_count,count))
 
