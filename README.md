@@ -25,6 +25,7 @@ rootfolderpath = Movie Root Path
 searchForMovie = Enable forced search
 qualityProfileId = 
 ```
+
 ```
 Standard Profile ID
 1 Any
