@@ -11,7 +11,7 @@ api_key = config['radarr']['api_key']
 rootfolderpath = config['radarr']['rootfolderpath']
 searchForMovie = config['radarr']['searchForMovie']
 qualityProfileId = config['radarr']['qualityProfileId']
-
+omdbapi_key = config['radarr']['omdbapi_key']
 
 # Logging ##############################################################################################################
 
@@ -51,8 +51,9 @@ def add_movie(title, year):
 
 	# Get Movie imdbid 
 	headers = {"Content-type": "application/json", 'Accept':'application/json'}
-	r = requests.get("http://www.omdbapi.com/?t={}&y={}&apikey=43a1c303".format(title,year), headers=headers)
-	# time.sleep(0.5)
+	r = requests.get("https://www.omdbapi.com/?t={}&y={}&apikey={}".format(title,year,omdbapi_key), headers=headers)
+	if r.status_code == 401:
+		log.error("omdbapi Request limit reached!")
 	d = json.loads(r.text)
 	if r.status_code == 200: 
 		if d.get('Response') == "False": 
@@ -138,11 +139,11 @@ def add_movie(title, year):
 			rsp = requests.post(url, headers=headers, data=Rdata)
 			if rsp.status_code == 201:
 				if searchForMovie == "True": # Check If you want to force download search
-					log.info("\u001b[36mtm{}\t     \u001b[0m{} ({}) \u001b[32mAdded to Radarr :) \u001b[36;1mNow Searching.\u001b[0m".format(tmdbid,title,year))
+					log.info("\u001b[36mtm{}\t         \u001b[0m{} ({}) \u001b[32mAdded to Radarr :) \u001b[36;1mNow Searching.\u001b[0m".format(tmdbid,title,year))
 				else:
-					log.info("\u001b[36mtm{}\t     \u001b[0m{} ({}) \u001b[32mAdded to Radarr :) \u001b[31mSearch Disabled.\u001b[0m".format(tmdbid,title,year))
+					log.info("\u001b[36mtm{}\t         \u001b[0m{} ({}) \u001b[32mAdded to Radarr :) \u001b[31mSearch Disabled.\u001b[0m".format(tmdbid,title,year))
 			elif rsp.status_code == 400:
-				log.info("\u001b[36mtm{}\t     \u001b[0m{} ({}) already Exists in Radarr.".format(tmdbid,title,year))
+				log.info("\u001b[36mtm{}\t         \u001b[0m{} ({}) already Exists in Radarr.".format(tmdbid,title,year))
 				return
 		else:
 			log.error("\u001b[35m{}\t {} ({}) Not found, Not added to Radarr.\u001b[0m".format(imdbid,title,year))

@@ -24,6 +24,7 @@ baseurl = Radarr Base Url
 rootfolderpath = Movie Root Path
 searchForMovie = Enable forced search
 qualityProfileId = 
+omdbapi_key =  sign up here for free api key http://www.omdbapi.com/apikey.aspx
 ```
 ```
 Standard Profile ID
