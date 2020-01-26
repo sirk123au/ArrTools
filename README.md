@@ -1,6 +1,6 @@
 # Radarr Tools 
-## radarr_add_from_list.py Add Movies from a csv formatted file
-## radarr_remove_downloaded.py Removes already downloaded movies and removes there entries from Radarr 
+### radarr_add_from_list.py Add Movies from a csv formatted file
+### radarr_remove_downloaded.py Removes already downloaded movies and removes there entries from Radarr 
  
 The input list file has to have the format. It has to have MovieName,Year,imdbid(Optional Makes it easer to find movie)
 ```
