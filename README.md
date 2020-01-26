@@ -14,7 +14,7 @@ Schindler's List,1993
 ```
 when you run it use
 ```
-$python3 radarr_add_from_list.py movielist.txt
+$python3 radarr_add_from_list.py movielist.csv
 ```
 Rename config_example.ini and add your details
 

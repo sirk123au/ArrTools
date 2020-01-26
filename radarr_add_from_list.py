@@ -177,7 +177,10 @@ def main():
 	headers = {"Content-type": "application/json", "X-Api-Key": api_key }
 	url = "{}/api/movie".format(baseurl)
 	rsp = requests.get(url , headers=headers)
-	RadarrData = json.loads(rsp.text)
+	if rsp.status_code == 200:
+		RadarrData = json.loads(rsp.text)
+	else:
+		log.error("Failed to connect to Radar...")
 
 	with open(sys.argv[1], newline='') as csvfile:
 		m = csv.reader(csvfile)
