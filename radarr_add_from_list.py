@@ -68,10 +68,15 @@ def add_movie(title, year, imdbid):
 	for movie_to_add in RadarrData: movieIds.append(movie_to_add.get('imdbId')) 
 
 	if imdbid not in movieIds:
-		# Build json Data to inport into radarr
+		# Build json Data to inport into radarr	
+		session = requests.Session()
+		adapter = requests.adapters.HTTPAdapter(max_retries=20)
+		session.mount('https://', adapter)
+		session.mount('http://', adapter)
+		
 		headers = {"Content-type": "application/json", 'Accept':'application/json'}
 		url = "{}/api/movie/lookup/imdb?imdbId={}&apikey={}".format(baseurl, imdbid, api_key)
-		rsp = requests.get(url, headers=headers)
+		rsp = session.get(url, headers=headers)
 		if len(rsp.text)==0: 
 			log.error("\u001b[35mSorry. We couldn't find any movies matching {} ({})\u001b[0m".format(title,year))
 			return 
@@ -104,6 +109,7 @@ def add_movie(title, year, imdbid):
 		url = '{}/api/movie'.format(baseurl)
 		rsp = requests.post(url, headers=headers, data=Rdata)
 		if rsp.status_code == 201:
+			movie_added_count +=1
 			if searchForMovie == "True": # Check If you want to force download search
 				log.info("\u001b[36m{}\t \u001b[0m{} ({}) \u001b[32mAdded to Radarr :) \u001b[36;1mNow Searching.\u001b[0m".format(imdbid,title,year))
 			else:
@@ -140,6 +146,7 @@ def add_movie(title, year, imdbid):
 			url = '{}/api/movie'.format(baseurl)
 			rsp = requests.post(url, headers=headers, data=Rdata)
 			if rsp.status_code == 201:
+				movie_added_count +=1
 				if searchForMovie == "True": # Check If you want to force download search
 					log.info("\u001b[36mtm{}\t         \u001b[0m{} ({}) \u001b[32mAdded to Radarr :) \u001b[36;1mNow Searching.\u001b[0m".format(tmdbid,title,year))
 				else:
@@ -159,27 +166,28 @@ def add_movie(title, year, imdbid):
 
 def main():
 	print('\033c')
-	movies_count = 0
+	global movie_added_count
 	global RadarrData
+	movie_added_count = 0
 	if len(sys.argv)<2: log.error("No list Specified... Bye!!"); sys.exit(-1)
 	if not os.path.exists(sys.argv[1]): log.info("{} Does Not Exist".format(sys.argv[1])); sys.exit(-1)
-	with open(sys.argv[1]) as m: count = len(m.readlines())
+	with open(sys.argv[1]) as m: total_count = len(m.readlines())
 	f=open(sys.argv[1], "r")
 	if f.mode == 'r':
 		f1 = f.readlines()
 		if len(f1) == 0:
 			log.error("No Movies Found in file... Bye!!")
 			exit()
-		log.info("Found {} Movies... :)".format(count))
+		log.info("Found {} Movies... :)".format(total_count))
 
 		try:
-			log.info("Downloading Radarr Movie Data")
+			log.info("Downloading Radarr Movie Data...")
 			headers = {"Content-type": "application/json", "X-Api-Key": api_key }
 			url = "{}/api/movie".format(baseurl)
 			rsp = requests.get(url , headers=headers)
 			RadarrData = json.loads(rsp.text)
 			for x in f1:
-				movies_count +=1
+				
 				try:
 					title, year, imdbid = x.split(',')
 				except:
@@ -194,7 +202,7 @@ def main():
 		except Exception as e:
 				log.error(e)
 				sys.exit(-1)
-		log.info("Added {} of {} Movies".format(movies_count,count))
+		log.info("Added {} of {} Movies".format(movie_added_count,total_count))
 
 if __name__ == "__main__":
 	main()
