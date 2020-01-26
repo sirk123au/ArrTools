@@ -1,6 +1,8 @@
-import os, time, requests, logging, logging.handlers, json, sys, re
+import os, time, requests, logging, logging.handlers, json, sys, re, csv
 from colorlog import ColoredFormatter
 import configparser
+
+movie_added_count=0
 
 # Config ###############################################################################################################
 
@@ -48,6 +50,7 @@ log = logging.getLogger("app." + __name__)
 ########################################################################################################################
 
 def add_movie(title, year, imdbid):
+	global movie_added_count
 	if imdbid =="":
 		# Get Movie imdbid 
 		headers = {"Content-type": "application/json", 'Accept':'application/json'}
@@ -162,47 +165,29 @@ def add_movie(title, year, imdbid):
 		log.info("\u001b[36m{}\t \u001b[0m{} ({}) already Exists in Radarr.".format(imdbid,title,year))
 		return
 
-
-
 def main():
 	print('\033c')
-	global movie_added_count
 	global RadarrData
-	movie_added_count = 0
 	if len(sys.argv)<2: log.error("No list Specified... Bye!!"); sys.exit(-1)
 	if not os.path.exists(sys.argv[1]): log.info("{} Does Not Exist".format(sys.argv[1])); sys.exit(-1)
 	with open(sys.argv[1]) as m: total_count = len(m.readlines())
-	f=open(sys.argv[1], "r")
-	if f.mode == 'r':
-		f1 = f.readlines()
-		if len(f1) == 0:
-			log.error("No Movies Found in file... Bye!!")
-			exit()
-		log.info("Found {} Movies... :)".format(total_count))
+	if not total_count>0: log.error("No Movies Found in file... Bye!!"); exit()
+	log.info("Found {} Movies in csv. :)".format(total_count))
+	log.info("Downloading Radarr Movie Data. :)")
+	headers = {"Content-type": "application/json", "X-Api-Key": api_key }
+	url = "{}/api/movie".format(baseurl)
+	rsp = requests.get(url , headers=headers)
+	RadarrData = json.loads(rsp.text)
 
-		try:
-			log.info("Downloading Radarr Movie Data...")
-			headers = {"Content-type": "application/json", "X-Api-Key": api_key }
-			url = "{}/api/movie".format(baseurl)
-			rsp = requests.get(url , headers=headers)
-			RadarrData = json.loads(rsp.text)
-			for x in f1:
-				
-				try:
-					title, year, imdbid = x.split(',')
-				except:
-					title, year = x.split(',')
-					imdbid = ""
-				
-				if "(" or ")" in title: title = re.sub('[(&)]','', title)
-				year = year.rstrip()
-				imdbid = imdbid.rstrip()
-				add_movie(title, year,imdbid)
-
-		except Exception as e:
-				log.error(e)
-				sys.exit(-1)
-		log.info("Added {} of {} Movies".format(movie_added_count,total_count))
+	with open(sys.argv[1], newline='') as csvfile:
+		m = csv.reader(csvfile)
+		for row in m: 
+			try:title, year, imdbid = row				
+			except:title, year = row; imdbid = ''
+			title = re.sub('[(&)]','', title)
+			try: add_movie(title, year,imdbid)
+			except Exception as e: log.error(e); sys.exit(-1)
+	log.info("Added {} of {} Movies".format(movie_added_count,total_count))
 
 if __name__ == "__main__":
 	main()

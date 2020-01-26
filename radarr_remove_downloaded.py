@@ -4,7 +4,8 @@ import configparser
 
 # Config ###############################################################################################################
 
-config = configparser.ConfigParser().read('./config.ini')
+config = configparser.ConfigParser()
+config.read('./config.ini')
 baseurl = config['radarr']['baseurl']
 api_key = config['radarr']['api_key']
 
@@ -46,7 +47,7 @@ log = logging.getLogger("app." + __name__)
 ########################################################################################################################
 
 print('\033c')
-log.info("Downloading Radarr Movie Data")
+log.info("Downloading Radarr Movie Data...")
 headers = {"Content-type": "application/json", "X-Api-Key": api_key }
 url = "{}/api/movie".format(baseurl)
 rsp = requests.get(url, headers=headers)
@@ -61,12 +62,12 @@ for i in data:
             rsp = requests.delete(url, headers=headers)
             if rsp.status_code == 200:
                 count +=1
-                log.info ("{} ({}) is older than 1980, Removing from Radarr...".format(i['title'],i['year']))
+                log.info ("\u001b[36m{} ({})\u001b[0m is older than 1980, Removing from Radarr...".format(i['title'],i['year']))
     if i['hasFile']: 
         if os.path.exists(i['path']):
             if "720" or "1080" in i['movieFile']['quality']['quality']['name']:
                 rsp = requests.delete(url, headers=headers)
                 if rsp.status_code == 200:
                     count +=1
-                    log.info ("{} ({}) Has been downloaded, Removing from Radarr...".format(i['title'],i['year']))
+                    log.info ("\u001b[36m{} ({})\u001b[0m Has been downloaded, Removing from Radarr...".format(i['title'],i['year']))
 log.info ("Removed {} Movies.".format(count))
