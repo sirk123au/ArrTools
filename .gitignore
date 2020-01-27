@@ -2,3 +2,5 @@ syntax: glob
 config.ini
 *.log
 .vscode
+trakt_search.py
+sonarr_add_from_list.py
