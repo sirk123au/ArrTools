@@ -1,20 +1,39 @@
 # Radarr Tools 
 ### radarr_add_from_list.py Add Movies from a csv formatted file
+### sonarr_add_from_list.py Add Movies from a csv formatted file
 ### radarr_remove_downloaded.py Removes already downloaded movies and removes there entries from Radarr 
  
-The input list file has to have the format. It has to have MovieName,Year,imdbid(Optional Makes it easer to find movie)
+The input list file has to have the format. It has to have MovieName/ShowName,Year,imdbid(Optional Makes it easer to find movie/TV show)
+
+### Movies CSV
 ```
 Ben-Hur,1959,tt0052618
 Gone with the Wind,1939,tt0031381
 Vreme na nasilie,1988,tt0096403
 
-# OR without imdbid #
+Without imdbid
+
 The English Patient,1996
 Schindler's List,1993
 ```
+### TV Shows CSV
+
+```
+13 Reasons Why,2017,tt1837492
+50 Central,2017,tt7261310
+
+Without imdbID
+
+60 Days In,2016
+9-1-1,2018
+A Discovery of Witches,2018
+
+```
+
 when you run it use
 ```
 $python3 radarr_add_from_list.py movielist.csv
+$python3 sonarr_add_from_list.py showlist.csv
 ```
 Rename config_example.ini and add your details
 
