@@ -4,13 +4,13 @@
 
 *sonarr_add_from_list.py* Add Movies from a csv formatted file.
 
-*radarr_remove_downloaded.py* Removes already downloaded movies and removes there entries from Radarr.
+*radarr_remove_downloaded.py* Removes already downloaded movies and removes their entries from Radarr.
 
 *backup_radarr_2csv.py* Creates a backup of the Radarr Database for easy importing.
 
 *backup_sonarr_2csv.py* Creates a backup of the Sonarr Database for easy importing.
 
-*get_imdbid.py* Matches the imdbid from a csv list MovieName/ShowName,Year for easy importing for the list import.
+*get_imdbid.py* Matches the imdbd from a csv list MovieName/ShowName,Year for easy importing for the list import.
 
 Using radarr_add_from_list/sonarr_add_from_list
 The input list file has to have the format. It has to have MovieName/ShowName,Year,imdbid(Optional Makes it easer to find movie/TV show)
