@@ -14,6 +14,9 @@ rootfolderpath = config['sonarr']['rootfolderpath']
 searchForShow = config['sonarr']['searchForShow']
 qualityProfileId = config['sonarr']['qualityProfileId']
 omdbapi_key = config['sonarr']['omdbapi_key']
+tvdb_api = config['sonarr']['tvdb_api']
+tvdb_userkey = config['sonarr']['tvdb_userkey']
+tvdb_username = config['sonarr']['tvdb_username']
 
 # Logging ##############################################################################################################
 
@@ -115,7 +118,7 @@ def add_show(title,year,imdbid):
         data = json.loads(rsp.text)
         if rsp.status_code == 201:
             show_added_count +=1
-            if searchForShow == "True": # Check If you want to force download search
+            if searchForShow == "True":
                 log.info("\u001b[36m{}\t \u001b[0m{} ({}) \u001b[32mAdded to Sonarr :) \u001b[36;1mNow Searching.\u001b[0m".format(imdbid,title,year))
             else:
                 log.info("\u001b[36m{}\t \u001b[0m{} ({}) \u001b[32mAdded to Sonarr :) \u001b[31mSearch Disabled.\u001b[0m".format(imdbid,title,year))
@@ -169,9 +172,9 @@ def get_tvdbId(imdbid,title):
 
 def get_token():
     data = {
-        "apikey": "2D988GISBJ4D4ZQ8",
-        "userkey": "PDOVO7I9PL24X5KR", 
-        "username": "sirk123auwt7" 
+        "apikey": tvdb_api,
+        "userkey": tvdb_userkey, 
+        "username": tvdb_username 
         }
     url = "https://api.thetvdb.com/login"
     rsp = requests.post(url, json=data)
