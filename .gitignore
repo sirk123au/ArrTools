@@ -3,3 +3,4 @@ config.ini
 *.log
 .vscode
 trakt_search.py
+*.csv

@@ -170,6 +170,7 @@ def add_movie(title, year, imdbid):
 
 def main():
 	print('\033c')
+	if sys.version_info[0] < 3: log.error("Must be using Python 3"); sys.exit(-1)
 	global RadarrData
 	if len(sys.argv)<2: log.error("No list Specified... Bye!!"); sys.exit(-1)
 	if not os.path.exists(sys.argv[1]): log.info("{} Does Not Exist".format(sys.argv[1])); sys.exit(-1)

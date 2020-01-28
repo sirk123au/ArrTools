@@ -47,6 +47,7 @@ log = logging.getLogger("app." + __name__)
 ########################################################################################################################
 
 print('\033c')
+if sys.version_info[0] < 3: log.error("Must be using Python 3"); sys.exit(-1)
 log.info("Downloading Radarr Movie Data...")
 headers = {"Content-type": "application/json", "X-Api-Key": api_key }
 url = "{}/api/movie".format(baseurl)

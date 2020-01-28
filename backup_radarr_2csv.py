@@ -1,5 +1,6 @@
-import requests, json, csv
-import configparser
+import requests, json, csv, sys, configparser
+
+if sys.version_info[0] < 3: raise Exception("Must be using Python 3")
 
 config = configparser.ConfigParser()
 config.read('./config.ini')
