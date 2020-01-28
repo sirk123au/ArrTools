@@ -62,8 +62,11 @@ rootfolderpath =
 searchForShow = 
 qualityProfileId = 
 omdbapi_key = 
-Standard Profile ID
+tvdb_api =  ; sign up here for a api key https://thetvdb.com/api-information
+tvdb_userkey = 
+tvdb_username = 
 
+Standard Profile ID
 1 Any
 2 SD
 3 HD-720p
