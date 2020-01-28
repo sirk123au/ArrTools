@@ -3,6 +3,7 @@ from colorlog import ColoredFormatter
 import configparser
 
 movie_added_count=0
+movie_exist_count=0
 
 # Config ###############################################################################################################
 
@@ -51,6 +52,7 @@ log = logging.getLogger("app." + __name__)
 
 def add_movie(title, year, imdbid):
 	global movie_added_count
+	global movie_exist_count
 	if imdbid =="":
 		# Get Movie imdbid 
 		headers = {"Content-type": "application/json", 'Accept':'application/json'}
@@ -155,13 +157,14 @@ def add_movie(title, year, imdbid):
 				else:
 					log.info("\u001b[36mtm{}\t         \u001b[0m{} ({}) \u001b[32mAdded to Radarr :) \u001b[31mSearch Disabled.\u001b[0m".format(tmdbid,title,year))
 			elif rsp.status_code == 400:
+				movie_exist_count +=1
 				log.info("\u001b[36mtm{}\t         \u001b[0m{} ({}) already Exists in Radarr.".format(tmdbid,title,year))
 				return
 		else:
 			log.error("\u001b[35m{}\t {} ({}) Not found, Not added to Radarr.\u001b[0m".format(imdbid,title,year))
 			return
 	else:
-		# if imdbid == None: imdbid = "tt0000000"
+		movie_exist_count +=1
 		log.info("\u001b[36m{}\t \u001b[0m{} ({}) already Exists in Radarr.".format(imdbid,title,year))
 		return
 
@@ -180,21 +183,21 @@ def main():
 		log.error("Failed to connect to Radar...")
 
 	with open(sys.argv[1], newline='') as csvfile:
-        m = csv.reader(csvfile)
-        s = sorted(m, key=lambda row:(row), reverse=False)
-        total_count = len(s)
-        if not total_count>0: log.error("No Movies Found in file... Bye!!"); exit()
-        log.info("Found {} Movies in {}. :)".format(total_count,sys.argv[1]))
+		m = csv.reader(csvfile)
+		s = sorted(m, key=lambda row:(row), reverse=False)
+		total_count = len(s)
+		if not total_count>0: log.error("No Movies Found in file... Bye!!"); exit()
+		log.info("Found {} Movies in {}. :)".format(total_count,sys.argv[1]))
 
-        for row in s:
-            if not (row): continue
-            num_cols = len(row)
-            if num_cols == 2: title, year = row; imdbid = ''
-            elif num_cols == 3: title, year, imdbid = row
-            else: log.error("There was an error reading {} Details".format(title))
+		for row in s:
+			if not (row): continue
+			num_cols = len(row)
+			if num_cols == 2: title, year = row; imdbid = ''
+			elif num_cols == 3: title, year, imdbid = row
+			else: log.error("There was an error reading {} Details".format(title))
 			try: add_movie(title, year,imdbid)
 			except Exception as e: log.error(e); sys.exit(-1)
-	log.info("Added {} of {} Movies".format(movie_added_count,total_count))
+	log.info("Added {} of {} Movies, {} already exists. ;)".format(movie_added_count,total_count,movie_exist_count))
 
 if __name__ == "__main__":
 	main()

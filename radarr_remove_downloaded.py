@@ -62,12 +62,12 @@ for i in data:
             rsp = requests.delete(url, headers=headers)
             if rsp.status_code == 200:
                 count +=1
-                log.info ("\u001b[36m{} ({})\u001b[0m is older than 1980, Removing from Radarr...".format(i['title'],i['year']))
+                log.info ("\u001b[36m{} ({})\u001b[0m is older than 1980, \u001b[31mRemoving from Radarr...\u001b[0m".format(i['title'],i['year']))
     if i['hasFile']: 
         if os.path.exists(i['path']):
             if "720" or "1080" in i['movieFile']['quality']['quality']['name']:
                 rsp = requests.delete(url, headers=headers)
                 if rsp.status_code == 200:
                     count +=1
-                    log.info ("\u001b[36m{} ({})\u001b[0m Has been downloaded, Removing from Radarr...".format(i['title'],i['year']))
+                    log.info ("\u001b[36m{} ({})\u001b[0m Has been downloaded, \u001b[31mRemoving from Radarr...\u001b[0m".format(i['title'],i['year']))
 log.info ("Removed {} Movies.".format(count))
