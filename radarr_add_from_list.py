@@ -170,9 +170,6 @@ def main():
 	global RadarrData
 	if len(sys.argv)<2: log.error("No list Specified... Bye!!"); sys.exit(-1)
 	if not os.path.exists(sys.argv[1]): log.info("{} Does Not Exist".format(sys.argv[1])); sys.exit(-1)
-	with open(sys.argv[1]) as m: total_count = len(m.readlines())
-	if not total_count>0: log.error("No Movies Found in file... Bye!!"); exit()
-	log.info("Found {} Movies in csv. :)".format(total_count))
 	log.info("Downloading Radarr Movie Data. :)")
 	headers = {"Content-type": "application/json", "X-Api-Key": api_key }
 	url = "{}/api/movie".format(baseurl)
@@ -183,11 +180,18 @@ def main():
 		log.error("Failed to connect to Radar...")
 
 	with open(sys.argv[1], newline='') as csvfile:
-		m = csv.reader(csvfile)
-		for row in m: 
-			try:title, year, imdbid = row				
-			except:title, year = row; imdbid = ''
-			title = re.sub('[(&)]','', title)
+        m = csv.reader(csvfile)
+        s = sorted(m, key=lambda row:(row), reverse=False)
+        total_count = len(s)
+        if not total_count>0: log.error("No Movies Found in file... Bye!!"); exit()
+        log.info("Found {} Movies in {}. :)".format(total_count,sys.argv[1]))
+
+        for row in s:
+            if not (row): continue
+            num_cols = len(row)
+            if num_cols == 2: title, year = row; imdbid = ''
+            elif num_cols == 3: title, year, imdbid = row
+            else: log.error("There was an error reading {} Details".format(title))
 			try: add_movie(title, year,imdbid)
 			except Exception as e: log.error(e); sys.exit(-1)
 	log.info("Added {} of {} Movies".format(movie_added_count,total_count))
