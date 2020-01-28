@@ -13,7 +13,8 @@
 *get_imdbid.py* Matches the imdbd from a csv list MovieName/ShowName,Year for easy importing for the list import.
 
 Using radarr_add_from_list/sonarr_add_from_list
-The input list file has to have the format. It has to have MovieName/ShowName,Year,imdbid(Optional Makes it easer to find movie/TV show)
+The input list file has to have the format. 
+It has to have MovieName/ShowName,Year,imdbid(Optional Makes it easer to find movie/TV show)
 
 Movies CSV
 ```
