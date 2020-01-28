@@ -54,9 +54,16 @@ rootfolderpath = Movie Root Path
 searchForMovie = Enable forced search
 qualityProfileId = 
 omdbapi_key =  sign up here for free api key http://www.omdbapi.com/apikey.aspx
-```
-```
+
+[sonarr]
+api_key = 
+baseurl = 
+rootfolderpath = 
+searchForShow = 
+qualityProfileId = 
+omdbapi_key = 
 Standard Profile ID
+
 1 Any
 2 SD
 3 HD-720p
