@@ -1,4 +1,9 @@
-import os, time, requests, json, sys, re
+import os, time, requests, json, sys, re, configparser
+
+
+config = configparser.ConfigParser()
+config.read('./config.ini')
+omdbapi_key = config['sonarr']['omdbapi_key']
 
 def main():
     if len(sys.argv)<2: 
@@ -9,7 +14,7 @@ def main():
         f1 = f.readlines()
         print('\033c')
         for x in f1:
-            r = requests.get("http://www.omdbapi.com/?t={}&apikey=aeaccc26".format(x.rstrip()))
+            r = requests.get("http://www.omdbapi.com/?t={}&apikey={}".format(x.rstrip(),omdbapi_key))
             if r.status_code == 200:
                 item = json.loads(r.text)
                 if item.get('Response') == "False": 
