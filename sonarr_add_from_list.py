@@ -1,6 +1,6 @@
-import os, time, requests, logging, logging.handlers, json, sys, re, csv
+import os, time, requests, logging, logging.handlers, json, sys, re, csv, configparser
 from colorlog import ColoredFormatter
-import configparser
+from datetime import  datetime
 
 show_added_count = 0
 show_exist_count = 0
@@ -42,9 +42,11 @@ logger.setLevel(logging.INFO) # DEBUG To show all
 logger.setFormatter(formatter)
 logging.getLogger().addHandler(logger)
 
-filelogger = logging.handlers.RotatingFileHandler(filename='./safl.log')
+if not os.path.exists("./logs/"): os.mkdir("./logs/")
+logFileName =  "./logs/safl_{}.log".format(datetime.now().strftime("%Y-%m-%d-%H.%M"))
+filelogger = logging.handlers.RotatingFileHandler(filename=logFileName)
 filelogger.setLevel(logging.DEBUG)
-logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
+logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
 filelogger.setFormatter(logFormatter)
 logging.getLogger().addHandler(filelogger)
 
@@ -76,6 +78,7 @@ def add_show(title,year,imdbid):
         session.mount('http://', adapter) 
 
         if tvdbId is None: log.error("Not tvdbId found for {}".format(title)); return
+        if not qualityProfileId.isdigit(): ProfileId = get_profile_from_id(qualityProfileId)
         headers = {"Content-type": "application/json"}
         url = "{}/api/series/lookup?term=tvdb:{}&apikey={}".format(baseurl,tvdbId, api_key )
         rsp = session.get(url, headers=headers)
@@ -97,7 +100,7 @@ def add_show(title,year,imdbid):
             "titleslug": titleslug,
             "monitored": 'true' ,
             "seasonFolder": 'true',
-            "qualityProfileId": qualityProfileId,
+            "qualityProfileId": ProfileId,
             "rootFolderPath": rootfolderpath ,
             "images": images,
             "seasons": seasons,
@@ -181,6 +184,18 @@ def get_token():
         return data['token']
     else:
         log.error("Failed to get TvDB JWT Token"); sys.exit(-1)
+
+def get_profile_from_id(id): 
+    headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
+    url = "{}/api/profile".format(baseurl)
+    r = requests.get(url, headers=headers)
+    d = json.loads(r.text)
+    profile = next((item for item in d if item["name"].lower() == id.lower()), False)
+    if not profile:
+        log.error('Could not find profile_id for instance profile {}'.format(id))
+        sys.exit(0)
+    return  profile.get('id')
+
 
 def main():
     print('\033c')

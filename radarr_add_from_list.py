@@ -1,6 +1,7 @@
 import os, time, requests, logging, logging.handlers, json, sys, re, csv
 from colorlog import ColoredFormatter
 import configparser
+from datetime import datetime 
 
 movie_added_count=0
 movie_exist_count=0
@@ -39,8 +40,9 @@ logger = logging.StreamHandler()
 logger.setLevel(logging.INFO) # DEBUG To show all
 logger.setFormatter(formatter)
 logging.getLogger().addHandler(logger)
-
-filelogger = logging.handlers.RotatingFileHandler(filename='./rafl.log')
+if not os.path.exists("./logs/"): os.mkdir("./logs/")
+logFileName =  "./logs/rafl_{}.log".format(datetime.now().strftime("%Y-%m-%d-%H.%M.%S"))
+filelogger = logging.handlers.RotatingFileHandler(filename=logFileName)
 filelogger.setLevel(logging.DEBUG)
 logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
 filelogger.setFormatter(logFormatter)
