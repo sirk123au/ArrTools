@@ -4,3 +4,7 @@ config.ini
 .vscode
 trakt_search.py
 *.csv
+*config.ini
+*.pyc
+*.csv
+import_from_tmdb.py

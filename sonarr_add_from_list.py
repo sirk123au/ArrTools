@@ -46,7 +46,7 @@ if not os.path.exists("./logs/"): os.mkdir("./logs/")
 logFileName =  "./logs/safl_{}.log".format(datetime.now().strftime("%Y-%m-%d-%H.%M"))
 filelogger = logging.handlers.RotatingFileHandler(filename=logFileName)
 filelogger.setLevel(logging.DEBUG)
-logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
 filelogger.setFormatter(logFormatter)
 logging.getLogger().addHandler(filelogger)
 
@@ -78,7 +78,10 @@ def add_show(title,year,imdbid):
         session.mount('http://', adapter) 
 
         if tvdbId is None: log.error("Not tvdbId found for {}".format(title)); return
-        if not qualityProfileId.isdigit(): ProfileId = get_profile_from_id(qualityProfileId)
+        if not qualityProfileId.isdigit(): 
+            ProfileId = get_profile_from_id(qualityProfileId)
+        else: 
+            ProfileId = qualityProfileId
         headers = {"Content-type": "application/json"}
         url = "{}/api/series/lookup?term=tvdb:{}&apikey={}".format(baseurl,tvdbId, api_key )
         rsp = session.get(url, headers=headers)

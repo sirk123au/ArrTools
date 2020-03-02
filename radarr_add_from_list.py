@@ -41,7 +41,7 @@ logger.setLevel(logging.INFO) # DEBUG To show all
 logger.setFormatter(formatter)
 logging.getLogger().addHandler(logger)
 if not os.path.exists("./logs/"): os.mkdir("./logs/")
-logFileName =  "./logs/rafl_{}.log".format(datetime.now().strftime("%Y-%m-%d-%H.%M.%S"))
+logFileName =  "./logs/rafl.log"#.format(datetime.now().strftime("%Y-%m-%d-%H.%M.%S"))
 filelogger = logging.handlers.RotatingFileHandler(filename=logFileName)
 filelogger.setLevel(logging.DEBUG)
 logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
@@ -55,32 +55,23 @@ log = logging.getLogger("app." + __name__)
 def add_movie(title, year, imdbid):
 	global movie_added_count
 	global movie_exist_count
-	if imdbid =="":
-		# Get Movie imdbid 
-		headers = {"Content-type": "application/json", 'Accept':'application/json'}
-		r = requests.get("https://www.omdbapi.com/?t={}&y={}&apikey={}".format(title,year,omdbapi_key), headers=headers)
-		if r.status_code == 401:
-			log.error("omdbapi Request limit reached!")
-		d = json.loads(r.text)
-		if r.status_code == 200: 
-			if d.get('Response') == "False": 
-				imdbid =  None
-			else: 
-				imdbid = d.get('imdbID')
-		else: 
-			imdbid = None
+	global ProfileId
+	if year == '': year = get_year(imdbid)
+	if imdbid == '': imdbid = get_imdbid(title,year)
 
 	# Store Radarr Server imdbid for faster matching
 	movieIds = []
 	for movie_to_add in RadarrData: movieIds.append(movie_to_add.get('imdbId')) 
-
 	if imdbid not in movieIds:
 		# Build json Data to inport into radarr	
 		session = requests.Session()
 		adapter = requests.adapters.HTTPAdapter(max_retries=20)
 		session.mount('https://', adapter)
 		session.mount('http://', adapter)
-		
+		if not qualityProfileId.isdigit(): 
+			ProfileId = get_profile_from_id(qualityProfileId) 
+		else: 
+			ProfileId = qualityProfileId
 		headers = {"Content-type": "application/json", 'Accept':'application/json'}
 		url = "{}/api/movie/lookup/imdb?imdbId={}&apikey={}".format(baseurl, imdbid, api_key)
 		rsp = session.get(url, headers=headers)
@@ -96,7 +87,7 @@ def add_movie(title, year, imdbid):
 			titleslug = data["titleSlug"]
 			Rdata = json.dumps({
 				"title": title , 
-				"qualityProfileId": qualityProfileId , 
+				"qualityProfileId": ProfileId , 
 				"year": year ,
 				"tmdbId": tmdbid ,
 				"titleslug":titleslug, 
@@ -138,7 +129,7 @@ def add_movie(title, year, imdbid):
 			titleslug = data[0]["titleSlug"]
 			Rdata = json.dumps({
 				"title": title , 
-				"qualityProfileId": qualityProfileId , 
+				"qualityProfileId": ProfileId , 
 				"year": year ,
 				"tmdbId": tmdbid ,
 				"titleslug":titleslug, 
@@ -170,6 +161,49 @@ def add_movie(title, year, imdbid):
 		log.info("\u001b[36m{}\t \u001b[0m{} ({}) already Exists in Radarr.".format(imdbid,title,year))
 		return
 
+
+def get_profile_from_id(id): 
+    headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
+    url = "{}/api/profile".format(baseurl)
+    r = requests.get(url, headers=headers)
+    d = json.loads(r.text)
+    profile = next((item for item in d if item["name"].lower() == id.lower()), False)
+    if not profile:
+        log.error('Could not find profile_id for instance profile {}'.format(id))
+        sys.exit(0)
+    return  profile.get('id')
+
+def get_imdbid(title,year):
+	# Get Movie imdbid 
+	headers = {"Content-type": "application/json", 'Accept':'application/json'}
+	r = requests.get("https://www.omdbapi.com/?t={}&y={}&apikey={}".format(title,year,omdbapi_key), headers=headers)
+	if r.status_code == 401:
+		log.error("omdbapi Request limit reached!")
+	d = json.loads(r.text)
+	if r.status_code == 200: 
+		if d.get('Response') == "False": 
+			return  None
+		else: 
+			return d.get('imdbID')
+	else: 
+		return None
+
+def get_year(imdbid):
+	# Get Movie Year 
+	headers = {"Content-type": "application/json", 'Accept':'application/json'}
+	r = requests.get("https://www.omdbapi.com/?i={}&apikey={}".format(imdbid,omdbapi_key), headers=headers)
+	if r.status_code == 401:
+		log.error("omdbapi Request limit reached!")
+	d = json.loads(r.text)
+	if r.status_code == 200: 
+		if d.get('Response') == "False": 
+			return None
+		else: 
+			return d.get('Year')
+	else: 
+		return None
+
+
 def main():
 	print('\033c')
 	if sys.version_info[0] < 3: log.error("Must be using Python 3"); sys.exit(-1)
@@ -184,20 +218,14 @@ def main():
 		RadarrData = json.loads(rsp.text)
 	else:
 		log.error("Failed to connect to Radar...")
-
-	with open(sys.argv[1], newline='') as csvfile:
-		m = csv.reader(csvfile)
-		s = sorted(m, key=lambda row:(row), reverse=False)
-		total_count = len(s)
+	with open(sys.argv[1]) as csvfile: total_count = len(list(csv.DictReader(csvfile)))
+	with open(sys.argv[1]) as csvfile:
+		m = csv.DictReader(csvfile)
 		if not total_count>0: log.error("No Movies Found in file... Bye!!"); exit()
 		log.info("Found {} Movies in {}. :)".format(total_count,sys.argv[1]))
-
-		for row in s:
+		for row in m:
 			if not (row): continue
-			num_cols = len(row)
-			if num_cols == 2: title, year = row; imdbid = ''
-			elif num_cols == 3: title, year, imdbid = row
-			else: log.error("There was an error reading {} Details".format(title))
+			title = row['title']; year = row['year']; imdbid = row['imdbid']
 			try: add_movie(title, year,imdbid)
 			except Exception as e: log.error(e); sys.exit(-1)
 	log.info("Added {} of {} Movies, {} already exists. ;)".format(movie_added_count,total_count,movie_exist_count))
