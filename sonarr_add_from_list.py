@@ -4,6 +4,7 @@ from datetime import  datetime
 
 show_added_count = 0
 show_exist_count = 0
+sonarrData = []
 # Config ###############################################################################################################
 
 config = configparser.ConfigParser()
@@ -70,7 +71,7 @@ def add_show(title,year,imdbid):
         tvdbId = get_tvdbId(imdbid,title)
         if tvdbId in tvdbIds: 
             show_exist_count +=1
-            log.info("\u001b[36m{}\t \u001b[32m{} ({}) \u001b[0malready Exists in Sonarr.".format(imdbid,title,year))
+            log.info("{}\t {} ({}) already Exists in Sonarr.".format(imdbid,title,year))
             return
         session = requests.Session()
         adapter = requests.adapters.HTTPAdapter(max_retries=20)
@@ -87,7 +88,7 @@ def add_show(title,year,imdbid):
         rsp = session.get(url, headers=headers)
         data = json.loads(rsp.text)
         if len(rsp.text)==0: 
-            log.error("\u001b[35mSorry. We couldn't find any Shows matching {} ({})\u001b[0m".format(title,year))
+            log.error("Sorry. We couldn't find any Shows matching {} ({})".format(title,year))
             return 
         tvdbId = data[0]["tvdbId"]
         title = data[0]["title"]
@@ -122,20 +123,20 @@ def add_show(title,year,imdbid):
         if rsp.status_code == 201:
             show_added_count +=1
             if searchForShow == "True":
-                log.info("\u001b[36m{}\t \u001b[0m{} ({}) \u001b[32mAdded to Sonarr :) \u001b[36;1mNow Searching.\u001b[0m".format(imdbid,title,year))
+                log.info("{}\t {} ({}) Added to Sonarr :) Now Searching.".format(imdbid,title,year))
             else:
-                log.info("\u001b[36m{}\t \u001b[0m{} ({}) \u001b[32mAdded to Sonarr :) \u001b[31mSearch Disabled.\u001b[0m".format(imdbid,title,year))
+                log.info("{}\t {} ({}) Added to Sonarr :) Search Disabled.".format(imdbid,title,year))
         elif rsp.status_code == 400:
             show_exist_count +=1
-            log.info("\u001b[36m{}\t \u001b[32m{} ({}) \u001b[0malready Exists in Sonarr.".format(imdbid,title,year))
+            log.info("{}\t {} ({}) already Exists in Sonarr.".format(imdbid,title,year))
             return
         else:
-            log.error("\u001b[35m{}\t {} ({}) Not found, Not added to Sonarr.\u001b[0m".format(imdbid,title,year))
+            log.error("{}\t {} ({}) Not found, Not added to Sonarr.".format(imdbid,title,year))
             return
     
     else:
         show_exist_count+=1
-        log.info("\u001b[36m{}\t \u001b[32m{} ({}) \u001b[0malready Exists in Sonarr.".format(imdbid,title,year))
+        log.info("{}\t {} ({}) already Exists in Sonarr.".format(imdbid,title,year))
         return
 
 def get_imdbid(title,year):
@@ -154,14 +155,19 @@ def get_imdbid(title,year):
         return None 
 
 def get_tvdbId(imdbid,title):
-    headers = {"Content-type": "application/json",  "Authorization": "Bearer {}".format(get_token())}
+    JWT_token = get_token()
+    if JWT_token == '':
+        log.error("Failed to get thetvdb token")
+        sys.exit(-1)   
+    headers = {"Content-type": "application/json",  "Authorization": "Bearer {}".format(JWT_token)}
     url = "https://api.thetvdb.com/search/series?imdbId={}".format(imdbid)
     rsp = requests.get(url, headers=headers)
     if rsp.status_code == 200:
         tmdb_data = json.loads(rsp.text)
         return tmdb_data['data'][0]['id']
     elif rsp.status_code == 404:
-        headers = {"Content-type": "application/json",  "Authorization": "Bearer {}".format(get_token())}
+         
+        headers = {"Content-type": "application/json",  "Authorization": "Bearer {}".format(JWT_token)}
         url = "https://api.thetvdb.com/search/series?name={}".format(title)
         rsp = requests.get(url, headers=headers)
         if rsp.status_code == 200:
