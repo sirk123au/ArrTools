@@ -166,6 +166,7 @@ def get_tvdbId(imdbid,title):
         tmdb_data = json.loads(rsp.text)
         return tmdb_data['data'][0]['id']
     elif rsp.status_code == 404:
+<<<<<<< HEAD
          
         headers = {"Content-type": "application/json",  "Authorization": "Bearer {}".format(JWT_token)}
         url = "https://api.thetvdb.com/search/series?name={}".format(title)
