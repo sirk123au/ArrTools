@@ -44,7 +44,7 @@ logger.setFormatter(formatter)
 logging.getLogger().addHandler(logger)
 
 if not os.path.exists("./logs/"): os.mkdir("./logs/")
-logFileName =  "./logs/safl_{}.log".format(datetime.now().strftime("%Y-%m-%d-%H.%M"))
+logFileName =  "./logs/safl.log"
 filelogger = logging.handlers.RotatingFileHandler(filename=logFileName)
 filelogger.setLevel(logging.DEBUG)
 logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
