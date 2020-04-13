@@ -168,6 +168,12 @@ def get_tvdbId(imdbid,title):
     elif rsp.status_code == 404:
 <<<<<<< HEAD
          
+=======
+        JWT_token = get_token()
+        if JWT_token == '':
+            log.error("Failed to get thetvdb token")
+            sys.exit(-1)            
+>>>>>>> 98b03b7c3ab36a20466a188961a7929fccb6b3b2
         headers = {"Content-type": "application/json",  "Authorization": "Bearer {}".format(JWT_token)}
         url = "https://api.thetvdb.com/search/series?name={}".format(title)
         rsp = requests.get(url, headers=headers)
