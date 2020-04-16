@@ -218,8 +218,8 @@ def main():
 		RadarrData = json.loads(rsp.text)
 	else:
 		log.error("Failed to connect to Radar...")
-	with open(sys.argv[1]) as csvfile: total_count = len(list(csv.DictReader(csvfile)))
-	with open(sys.argv[1]) as csvfile:
+	with open(sys.argv[1], encoding="utf8") as csvfile: total_count = len(list(csv.DictReader(csvfile)))
+	with open(sys.argv[1], encoding="utf8") as csvfile:
 		m = csv.DictReader(csvfile)
 		if not total_count>0: log.error("No Movies Found in file... Bye!!"); exit()
 		log.info("Found {} Movies in {}. :)".format(total_count,sys.argv[1]))
