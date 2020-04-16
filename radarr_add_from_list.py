@@ -11,6 +11,7 @@ movie_exist_count=0
 config = configparser.ConfigParser()
 config.read('./config.ini')
 baseurl = config['radarr']['baseurl']
+urlbase = config['radarr']['urlbase']
 api_key = config['radarr']['api_key']
 rootfolderpath = config['radarr']['rootfolderpath']
 searchForMovie = config['radarr']['searchForMovie']
@@ -73,7 +74,7 @@ def add_movie(title, year, imdbid):
 		else: 
 			ProfileId = qualityProfileId
 		headers = {"Content-type": "application/json", 'Accept':'application/json'}
-		url = "{}/api/movie/lookup/imdb?imdbId={}&apikey={}".format(baseurl, imdbid, api_key)
+		url = "{}{}/api/movie/lookup/imdb?imdbId={}&apikey={}".format(baseurl,urlbase, imdbid, api_key)
 		rsp = session.get(url, headers=headers)
 		if len(rsp.text)==0: 
 			log.error("\u001b[35mSorry. We couldn't find any movies matching {} ({})\u001b[0m".format(title,year))
@@ -104,7 +105,7 @@ def add_movie(title, year, imdbid):
 			return
 		# Add Movie To Radarr
 		headers = {"Content-type": "application/json", 'Accept':'application/json', "X-Api-Key": api_key}
-		url = '{}/api/movie'.format(baseurl)
+		url = '{}{}/api/movie'.format(baseurl,urlbase)
 		rsp = requests.post(url, headers=headers, data=Rdata)
 		if rsp.status_code == 201:
 			movie_added_count +=1
@@ -115,7 +116,7 @@ def add_movie(title, year, imdbid):
 	
 	elif imdbid == None:
 		# Search by Movie Title in Radarr
-		url = "{}/api/movie/lookup?term={}&apikey={}".format(baseurl, title.replace(" ","%20"), api_key)
+		url = "{}{}/api/movie/lookup?term={}&apikey={}".format(baseurl,urlbase, title.replace(" ","%20"), api_key)
 		rsp = requests.get(url, headers=headers)
 		data = json.loads(rsp.text)
 		if rsp.text =="[]":
@@ -141,7 +142,7 @@ def add_movie(title, year, imdbid):
 				})
 			# Add Movie To Radarr
 			headers = {"Content-type": "application/json", 'Accept':'application/json', "X-Api-Key": api_key}
-			url = '{}/api/movie'.format(baseurl)
+			url = '{}{}/api/movie'.format(baseurl,urlbase)
 			rsp = requests.post(url, headers=headers, data=Rdata)
 			if rsp.status_code == 201:
 				movie_added_count +=1
@@ -164,7 +165,7 @@ def add_movie(title, year, imdbid):
 
 def get_profile_from_id(id): 
     headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
-    url = "{}/api/profile".format(baseurl)
+    url = "{}{}/api/profile".format(baseurl,urlbase)
     r = requests.get(url, headers=headers)
     d = json.loads(r.text)
     profile = next((item for item in d if item["name"].lower() == id.lower()), False)
@@ -212,7 +213,7 @@ def main():
 	if not os.path.exists(sys.argv[1]): log.info("{} Does Not Exist".format(sys.argv[1])); sys.exit(-1)
 	log.info("Downloading Radarr Movie Data. :)")
 	headers = {"Content-type": "application/json", "X-Api-Key": api_key }
-	url = "{}/api/movie".format(baseurl)
+	url = "{}{}/api/movie".format(baseurl,urlbase)
 	rsp = requests.get(url , headers=headers)
 	if rsp.status_code == 200:
 		RadarrData = json.loads(rsp.text)

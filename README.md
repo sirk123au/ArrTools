@@ -18,6 +18,7 @@ It has to have MovieName/ShowName,Year,imdbid(Optional Makes it easer to find mo
 
 Movies CSV
 ```
+title,year,imdbid
 Ben-Hur,1959,tt0052618
 Gone with the Wind,1939,tt0031381
 Vreme na nasilie,1988,tt0096403
@@ -51,6 +52,7 @@ Rename config_example.ini and add your details
 ```
 api_key = Radarr Api Key
 baseurl = Radarr Base Url
+urlbase = ; Include URL Base if you have it enabled
 rootfolderpath = Movie Root Path
 searchForMovie = Enable forced search
 qualityProfileId = 
@@ -59,6 +61,7 @@ omdbapi_key =  sign up here for free api key http://www.omdbapi.com/apikey.aspx
 [sonarr]
 api_key = 
 baseurl = 
+urlbase = ; Include URL Base if you have it enabled
 rootfolderpath = 
 searchForShow = 
 qualityProfileId = 
