@@ -8,3 +8,5 @@ trakt_search.py
 *.pyc
 *.csv
 import_from_tmdb.py
+yt_music_vid_get.py
+cookies.txt

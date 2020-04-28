@@ -62,18 +62,18 @@ for i in data:
     if rsp.status_code == 200:
         log.info ("\u001b[36m{} ({})\u001b[0m \u001b[31mRemoving from Radarr...\u001b[0m".format(i['title'],i['year']))
 
-    #if i['hasFile']: print(json.dumps(i, indent=4, sort_keys=True))
+    # if i['hasFile']: print(json.dumps(i, indent=4, sort_keys=True))
     # if i['year'] < 1980 and i['hasFile']:
     #     if os.path.exists(i['path']):
     #         rsp = requests.delete(url, headers=headers)
     #         if rsp.status_code == 200:
     #             count +=1
     #             log.info ("\u001b[36m{} ({})\u001b[0m is older than 1980, \u001b[31mRemoving from Radarr...\u001b[0m".format(i['title'],i['year']))
-    # if i['hasFile']: 
-    #     if os.path.exists(i['path']):
-    #         if "720" or "1080" in i['movieFile']['quality']['quality']['name']:
-    #             rsp = requests.delete(url, headers=headers)
-    #             if rsp.status_code == 200:
-    #                 count +=1
-    #                 log.info ("\u001b[36m{} ({})\u001b[0m Has been downloaded, \u001b[31mRemoving from Radarr...\u001b[0m".format(i['title'],i['year']))
-# log.info ("Removed {} Movies.".format(count))
+    if i['hasFile']: 
+        if os.path.exists(i['path']):
+            # if "720" or "1080" in i['movieFile']['quality']['quality']['name']:
+            rsp = requests.delete(url, headers=headers)
+            if rsp.status_code == 200:
+                count +=1
+                log.info ("\u001b[36m{} ({})\u001b[0m Has been downloaded, \u001b[31mRemoving from Radarr...\u001b[0m".format(i['title'],i['year']))
+log.info ("Removed {} Movies.".format(count))
