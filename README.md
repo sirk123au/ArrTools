@@ -14,7 +14,7 @@
 
 Using radarr_add_from_list/sonarr_add_from_list
 The input list file has to have the format. 
-It has to have MovieName/ShowName,Year,imdbid(Optional Makes it easer to find movie/TV show)
+It has to have MovieName/ShowName,Year,imdbid  *imdbid is Optional Makes it easer to find movie/TV show
 
 Use pip install -r requirments.txt to install the required python modules 
 
@@ -23,7 +23,6 @@ Movies CSV
 title,year,imdbid
 Ben-Hur,1959,tt0052618
 Gone with the Wind,1939,tt0031381
-Vreme na nasilie,1988,tt0096403
 
 Without imdbid
 
