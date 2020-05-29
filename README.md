@@ -83,4 +83,4 @@ Standard Profile ID
 
 Thanks for the support :)
 
-<a href="https://www.buymeacoffee.com/Sirk123au" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 140px !important;" ></a>
+<a href="https://www.buymeacoffee.com/Sirk123au" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" style="height: 20px !important;width: 80px !important;" ></a>
