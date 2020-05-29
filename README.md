@@ -80,3 +80,6 @@ Standard Profile ID
 5 Ultra-HD
 6 HD - 720p/1080p
 ```
+
+Thanks for the support if you want to buy me a coffee [click Here ](buymeacoff.ee/Sirk123au)![alt text](https://img.buymeacoffee.com/api/?name=Kris&size=300&bg-image=bmc)
+
