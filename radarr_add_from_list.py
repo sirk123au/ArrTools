@@ -15,6 +15,7 @@ urlbase = config['radarr']['urlbase']
 api_key = config['radarr']['api_key']
 rootfolderpath = config['radarr']['rootfolderpath']
 searchForMovie = config['radarr']['searchForMovie']
+if searchForMovie is None: searchForMovie = 'False'
 qualityProfileId = config['radarr']['qualityProfileId']
 omdbapi_key = config['radarr']['omdbapi_key']
 
