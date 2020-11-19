@@ -1,4 +1,4 @@
-import os, time, requests, logging, logging.handlers, json, sys, re, csv, configparser
+import os, time, requests, logging, logging.handlers, json, sys, re, csv, configparser, base64
 from colorlog import ColoredFormatter
 from datetime import  datetime
 
@@ -68,7 +68,9 @@ def add_show(title,year,imdbid):
     for shows_to_add in sonarrData:  tvdbIds.append(shows_to_add.get('tvdbId'))
    
     if imdbid not in imdbIds:
-        tvdbId = get_tvdbId(imdbid,title)
+        tvdbId = get_tvdbId_new(title,year,imdbid)
+
+        #tvdbId = get_tvdbId(imdbid,title)
         if tvdbId in tvdbIds: 
             show_exist_count +=1
             log.info("{}\t {} ({}) already Exists in Sonarr.".format(imdbid,title,year))
@@ -78,7 +80,7 @@ def add_show(title,year,imdbid):
         session.mount('https://', adapter)
         session.mount('http://', adapter) 
 
-        if tvdbId is None: log.error("Not tvdbId found for {}".format(title)); return
+        if tvdbId is None: log.error("No tvdbId found for {}".format(title)); return
         if not qualityProfileId.isdigit(): 
             ProfileId = get_profile_from_id(qualityProfileId)
         else: 
@@ -139,7 +141,7 @@ def add_show(title,year,imdbid):
         log.info("{}\t {} ({}) already Exists in Sonarr.".format(imdbid,title,year))
         return
 
-def get_imdbid(title,year):
+def get_imdbid(title,year,imdbid):
     # Get TV Show imdbid 
     headers = {"Content-type": "application/json", 'Accept':'application/json'}
     r = requests.get("https://www.omdbapi.com/?t={}&y={}&apikey={}".format(title,year,omdbapi_key), headers=headers)
@@ -153,6 +155,35 @@ def get_imdbid(title,year):
             return d.get('imdbID')
     else: 
         return None 
+
+def get_tvdbId_new(title,year,imdbid):
+    api = str(base64.b64decode('YWE2Yjc5YTBlZDdjM2Y3NWUyOWI1MjkyOTAyNjhmOGFkNzM0ZmE3MWUzYzA3Zjg2YmE2OTVlMzQzZDFmZmNjMw=='))
+    title = title.replace(" ","-")
+    title = title.replace("'","-")
+    title = title.replace(":","")
+    if title.find("&"): 
+        title = title.replace(" ","")
+        title = title.replace("&","-")
+    headers = {
+    'Content-Type': 'application/json',
+    'trakt-api-version': '2',
+    'trakt-api-key': api
+    }
+    rsp = requests.get('https://api.trakt.tv/search/imdb/{}?type=show'.format(imdbid), headers=headers)
+    if rsp.status_code == 200:
+        d = json.loads(rsp.text)
+        if d == []: 
+            rsp = requests.get('https://api.trakt.tv/shows/{}'.format(title), headers=headers)
+            if rsp.status_code == 200:
+                d = json.loads(rsp.text)
+                if d == []: return None 
+                return d['ids']['tvdb']
+            else:
+                return None
+        else:
+            return d[0]['show']['ids']['tvdb']
+    else:
+         return None
 
 def get_tvdbId(imdbid,title):
     JWT_token = get_token()
@@ -234,7 +265,10 @@ def main():
             elif num_cols == 3: title, year, imdbid = row
             else: log.error("There was an error reading {} Details".format(title))
             try: add_show(title, year,imdbid)
-            except Exception as e: log.error(e); sys.exit(-1)
+            except Exception as e: 
+                log.error(title,year)
+                log.error(e)
+                sys.exit(-1)
     log.info("Added {} of {} Shows, {} Already Exist".format(show_added_count,total_count,show_exist_count))
 
 
