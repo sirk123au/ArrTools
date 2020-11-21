@@ -60,8 +60,8 @@ def add_show(title,year,imdbid):
     # Add Missing to sonarr Work in Progress
     global show_added_count
     global show_exist_count
-    if imdbid =='' : imdbid = get_imdbid(title,year)
-    if imdbid =='': log.info("Not imdbid found for {}".format(title)); return
+    if imdbid == '' : imdbid = get_imdbid(title,year)
+    if imdbid == '' : log.info("Not imdbid found for {}".format(title)); return
     imdbIds = []
     tvdbIds = []
     for shows_to_add in sonarrData:  imdbIds.append(shows_to_add.get('imdbId'))

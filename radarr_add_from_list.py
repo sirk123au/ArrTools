@@ -219,7 +219,7 @@ def main():
 	if rsp.status_code == 200:
 		RadarrData = json.loads(rsp.text)
 	else:
-		log.error("Failed to connect to Radar...")
+		log.error("Failed to connect to Radarr...")
 	with open(sys.argv[1], encoding="utf8") as csvfile: total_count = len(list(csv.DictReader(csvfile)))
 	with open(sys.argv[1], encoding="utf8") as csvfile:
 		m = csv.DictReader(csvfile)

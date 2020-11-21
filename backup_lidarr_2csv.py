@@ -1,4 +1,4 @@
-import requests, json, csv, sys, configparser
+import requests, json, csv, sys, configparser, re
 
 if sys.version_info[0] < 3: raise Exception("Must be using Python 3")
 
@@ -15,7 +15,9 @@ with open('./lidarr_backup.csv', 'w', newline='') as csvfile:
     rsp = requests.get(url , headers=headers)
     if rsp.status_code == 200:
         lidarrData = json.loads(rsp.text)
-        for d in lidarrData: csvwriter.writerow([d['artistName'], d.get('foreignArtistId')])
+        for d in lidarrData:
+            artist = re.sub(r'[^a-zA-Z0-9 ]',r'', d['artistName']) 
+            csvwriter.writerow([artist, d.get('foreignArtistId')])
     else:
         print("Failed to connect to Radar...")
 print("Done...")
