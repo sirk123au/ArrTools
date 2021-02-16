@@ -58,9 +58,12 @@ def add_movie(title, year, imdbid):
 	global movie_added_count
 	global movie_exist_count
 	global ProfileId
+
 	if year == '': year = get_year(imdbid)
 	if imdbid == '': imdbid = get_imdbid(title,year)
-
+	if imdbid is None:
+		log.error("Failed to get imdbid for {} {}.").format(title,year)
+		return
 	# Store Radarr Server imdbid for faster matching
 	movieIds = []
 	for movie_to_add in RadarrData: movieIds.append(movie_to_add.get('imdbId')) 
@@ -72,6 +75,8 @@ def add_movie(title, year, imdbid):
 		session.mount('http://', adapter)
 		if not qualityProfileId.isdigit(): 
 			ProfileId = get_profile_from_id(qualityProfileId) 
+		elif qualityProfileId is None: 
+			log.error("\u001b[35m qualityProfileId Not Set in the config correctly.\u001b[0m")
 		else: 
 			ProfileId = qualityProfileId
 		headers = {"Content-type": "application/json", 'Accept':'application/json'}

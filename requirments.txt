@@ -1,4 +1,3 @@
 # pip install -r requirments.txt
 requests
 colorlog
-logging
