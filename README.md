@@ -20,12 +20,13 @@ Use pip install -r requirments.txt to install the required python modules
 
 Movies CSV
 ```
-title,year,imdbid
+title,year,imdbid (This header has to be included in the csv for it to work correctly)
 Ben-Hur,1959,tt0052618
 Gone with the Wind,1939,tt0031381
 
 Without imdbid
 
+title,year,imdbid
 The English Patient,1996
 Schindler's List,1993
 ```
@@ -54,7 +55,7 @@ Rename config_example.ini and add your details
 api_key = Radarr Api Key
 baseurl = Radarr Base Url
 urlbase = ; Include URL Base if you have it enabled
-rootfolderpath = Movie Root Path
+rootfolderpath = Movie Root Path (trailing slash is needed eg. /media/Movies/ or d:\media\Movies\)
 searchForMovie = Enable forced search
 qualityProfileId = 
 omdbapi_key =  sign up here for free api key http://www.omdbapi.com/apikey.aspx
@@ -63,7 +64,7 @@ omdbapi_key =  sign up here for free api key http://www.omdbapi.com/apikey.aspx
 api_key = 
 baseurl = 
 urlbase = ; Include URL Base if you have it enabled
-rootfolderpath = 
+rootfolderpath = Show Root Path (trailing slash is needed eg. /media/shows/ or d:\media\shows\)
 searchForShow = 
 qualityProfileId = 
 omdbapi_key = 
