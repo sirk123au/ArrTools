@@ -216,7 +216,7 @@ def main():
 	if sys.version_info[0] < 3: log.error("Must be using Python 3"); sys.exit(-1)
 	global RadarrData
 	if len(sys.argv)<2: log.error("No list Specified... Bye!!"); sys.exit(-1)
-	if not os.path.exists(sys.argv[1]): log.info("{} Does Not Exist".format(sys.argv[1])); sys.exit(-1)
+	if not os.path.exists(sys.argv[1]): log.error("{} Does Not Exist".format(sys.argv[1])); sys.exit(-1)
 	log.info("Downloading Radarr Movie Data. :)")
 	headers = {"Content-type": "application/json", "X-Api-Key": api_key }
 	url = "{}{}/api/movie".format(baseurl,urlbase)
@@ -232,6 +232,8 @@ def main():
 		log.info("Found {} Movies in {}. :)".format(total_count,sys.argv[1]))
 		for row in m:
 			if not (row): continue
+			try: row['title']
+			except: log.error("Invalid CSV File, Header does not contain title,year,imdbid"); sys.exit(-1)
 			title = row['title']; year = row['year']; imdbid = row['imdbid']
 			try: add_movie(title, year,imdbid)
 			except Exception as e: log.error(e); sys.exit(-1)
