@@ -69,8 +69,6 @@ def add_show(title,year,imdbid):
    
     if imdbid not in imdbIds:
         tvdbId = get_tvdbId_new(title,year,imdbid)
-
-        #tvdbId = get_tvdbId(imdbid,title)
         if tvdbId in tvdbIds: 
             show_exist_count +=1
             log.info("{}\t {} ({}) already Exists in Sonarr.".format(imdbid,title,year))
@@ -184,45 +182,6 @@ def get_tvdbId_new(title,year,imdbid):
             return d[0]['show']['ids']['tvdb']
     else:
          return None
-
-def get_tvdbId(imdbid,title):
-    JWT_token = get_token()
-    if JWT_token == '':
-        log.error("Failed to get thetvdb token")
-        sys.exit(-1)   
-    headers = {"Content-type": "application/json",  "Authorization": "Bearer {}".format(JWT_token)}
-    url = "https://api.thetvdb.com/search/series?imdbId={}".format(imdbid)
-    rsp = requests.get(url, headers=headers)
-    if rsp.status_code == 200:
-        tmdb_data = json.loads(rsp.text)
-        return tmdb_data['data'][0]['id']
-    elif rsp.status_code == 404:
-        headers = {"Content-type": "application/json",  "Authorization": "Bearer {}".format(JWT_token)}
-        url = "https://api.thetvdb.com/search/series?name={}".format(title)
-        rsp = requests.get(url, headers=headers)
-        if rsp.status_code == 200:
-            tmdb_data = json.loads(rsp.text)
-            return tmdb_data['data'][0]['id']
-        elif rsp.status_code == 404:
-
-            return None
-    else: 
-        log.error("Failed with status {}\n".format(rsp.status_code))
-        return None
-
-def get_token():
-    data = {
-        "apikey": tvdb_api,
-        "userkey": tvdb_userkey, 
-        "username": tvdb_username 
-        }
-    url = "https://api.thetvdb.com/login"
-    rsp = requests.post(url, json=data)
-    if rsp.status_code == 200:
-        data = json.loads(rsp.text)
-        return data['token']
-    else:
-        log.error("Failed to get TvDB JWT Token"); sys.exit(-1)
 
 def get_profile_from_id(id): 
     headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}

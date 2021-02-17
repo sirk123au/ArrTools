@@ -59,10 +59,10 @@ def add_movie(title, year, imdbid):
 	global movie_exist_count
 	global ProfileId
 
-	if year == '': year = get_year(imdbid)
-	if imdbid == '': imdbid = get_imdbid(title,year)
-	if imdbid is None:
-		log.error("Failed to get imdbid for {} {}.").format(title,year)
+	if year == None: year = get_year(imdbid)
+	if imdbid == None: imdbid = get_imdbid(title,year)
+	if imdbid == None: 
+		log.error("Failed to get imdbid for {} {}.".format(title,year))
 		return
 	# Store Radarr Server imdbid for faster matching
 	movieIds = []
@@ -183,7 +183,7 @@ def get_profile_from_id(id):
 def get_imdbid(title,year):
 	# Get Movie imdbid 
 	headers = {"Content-type": "application/json", 'Accept':'application/json'}
-	r = requests.get("https://www.omdbapi.com/?t={}&y={}&apikey={}".format(title,year,omdbapi_key), headers=headers)
+	r = requests.get("https://www.omdbapi.com/?t={}&y={}&type=movie&apikey={}".format(title,year,omdbapi_key), headers=headers)
 	if r.status_code == 401:
 		log.error("omdbapi Request limit reached!")
 	d = json.loads(r.text)
@@ -235,7 +235,7 @@ def main():
 			try: row['title']
 			except: log.error("Invalid CSV File, Header does not contain title,year,imdbid"); sys.exit(-1)
 			title = row['title']; year = row['year']; imdbid = row['imdbid']
-			try: add_movie(title, year,imdbid)
+			try: add_movie(title, year,imdbid) 
 			except Exception as e: log.error(e); sys.exit(-1)
 	log.info("Added {} of {} Movies, {} already exists. ;)".format(movie_added_count,total_count,movie_exist_count))
 
