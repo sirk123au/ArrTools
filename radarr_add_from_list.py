@@ -61,9 +61,8 @@ def add_movie(title, year, imdbid):
 
 	if year == None: year = get_year(imdbid)
 	if imdbid == None: imdbid = get_imdbid(title,year)
-	if imdbid == None: 
-		log.error("Failed to get imdbid for {} {}.".format(title,year))
-		return
+	if imdbid == None: log.error("Failed to get imdbid for {} {}.".format(title,year)); return
+	
 	# Store Radarr Server imdbid for faster matching
 	movieIds = []
 	for movie_to_add in RadarrData: movieIds.append(movie_to_add.get('imdbId')) 

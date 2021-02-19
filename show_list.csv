@@ -1,3 +1,4 @@
+title,year,imdbid
 13 Reasons Why,2017,tt1837492
 50 Central,2017,tt7261310
 60 Days In,2016,tt5564124
@@ -16,7 +17,7 @@ American Gods,2017,tt1898069
 American Horror Story,2011,tt1844624
 American Idol,2002,tt0319931
 Angie Tribeca,2016,tt3597790
-Animal Kingdom,2010,tt1313092
+Animal Kingdom,2010,tt5574490
 Arrow,2012,tt2193021
 Atlanta,2016,tt4288182
 Ballers,2015,tt2891574
@@ -77,7 +78,6 @@ Frontier,2016,tt4686698
 Fuller House,2016,tt3986586
 Future Man,2017,tt4975856
 Game of Thrones,2011,tt0944947
-Genius,2016,tt1703957
 Get Shorty,1995,tt0113161
 GLOW,2017,tt5770786
 God Friended Me,2018,tt7948998
@@ -133,7 +133,7 @@ Manifest,2018,tt8421350
 Mayans M.C.,2018,tt5715524
 McMafia,2018,tt6271042
 Medal of Honor,2018,tt7440274
-"Midnight, Texas",2017,tt5464086
+"Midnight Texas",2017,tt5464086
 Mindhunter,2017,tt5290382
 Miracle Workers,2019,tt7529770
 Misfit Garage,2014,tt4167914
@@ -172,7 +172,7 @@ Ride with Norman Reedus,2016,tt5547946
 Riverdale,2017,tt5420376
 Robot Chicken,2005,tt0437745
 Room 104,2017,tt6064882
-"Roswell, New Mexico",2019,tt7588054
+"Roswell, New Mexico",1999,tt0201391
 Russian Doll,2019,tt7520794
 S.W.A.T.,2003,tt6111130
 Saturday Night Live,1975,tt0072562
@@ -195,7 +195,7 @@ Sneaky Pete,2015,tt5011816
 Snowfall,2017,tt6439752
 Speechless,2016,tt5592146
 Splitting Up Together,2018,tt6492236
-Stan Lee's Lucky Man,2016,tt4800878
+Lucky Man,2016,tt4800878
 Star Trek: Discovery,2017,tt5171438
 Station 19,2018,tt7053188
 Strange Angel,2018,tt7210448
