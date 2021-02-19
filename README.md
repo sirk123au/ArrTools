@@ -26,18 +26,20 @@ Gone with the Wind,1939,tt0031381
 
 Without imdbid
 
-title,year,imdbid
+title,year,imdbid (This header has to be included in the csv for it to work correctly)
 The English Patient,1996
 Schindler's List,1993
 ```
 TV Shows CSV
 
 ```
+title,year,imdbid (This header has to be included in the csv for it to work correctly)
 13 Reasons Why,2017,tt1837492
 50 Central,2017,tt7261310
 
 Without imdbID
 
+title,year,imdbid (This header has to be included in the csv for it to work correctly)
 60 Days In,2016
 9-1-1,2018
 A Discovery of Witches,2018
