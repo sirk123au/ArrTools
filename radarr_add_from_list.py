@@ -59,7 +59,7 @@ def add_movie(title, year, imdbid):
 	global movie_exist_count
 	global ProfileId
 
-	if year == None: year = get_year(imdbid)
+	if year == "": year = get_year(imdbid)
 	if imdbid == None: imdbid = get_imdbid(title,year)
 	if imdbid == None: log.error("Failed to get imdbid for {} {}.".format(title,year)); return
 	
@@ -76,7 +76,7 @@ def add_movie(title, year, imdbid):
 			ProfileId = get_profile_from_id(qualityProfileId) 
 		elif qualityProfileId is None: 
 			log.error("\u001b[35m qualityProfileId Not Set in the config correctly.\u001b[0m")
-		else: 
+		elif match_profile_id(qualityProfileId) == True:
 			ProfileId = qualityProfileId
 		headers = {"Content-type": "application/json", 'Accept':'application/json'}
 		url = "{}{}/api/movie/lookup/imdb?imdbId={}&apikey={}".format(baseurl,urlbase, imdbid, api_key)
@@ -175,9 +175,20 @@ def get_profile_from_id(id):
     d = json.loads(r.text)
     profile = next((item for item in d if item["name"].lower() == id.lower()), False)
     if not profile:
-        log.error('Could not find profile_id for instance profile {}'.format(id))
+        log.error('Could not find profile_id for instance profile ID "{}"'.format(id))
         sys.exit(0)
     return  profile.get('id')
+
+def match_profile_id(id): 
+    headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
+    url = "{}{}/api/profile".format(baseurl,urlbase)
+    r = requests.get(url, headers=headers)
+    d = json.loads(r.text)
+    profile = next((item for item in d if item["name"].lower() == id.lower()), False)
+    if not profile:
+        log.error('Could not find profile_id for instance profile ID "{}"'.format(id))
+        sys.exit(0)
+    return  True
 
 def get_imdbid(title,year):
 	# Get Movie imdbid 
