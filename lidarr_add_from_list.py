@@ -52,7 +52,7 @@ log = logging.getLogger("app." + __name__)
 
 def add_artist(artistName,foreignArtistId):
 	global artist_exist_count, artist_added_count
-	# log.info("Adding {} to Lidarr.".format(artistName))
+	#log.info("Adding {} to Lidarr.".format(artistName))
 	data = json.dumps({
 		"artistName" : artistName ,
 		"foreignArtistId" : foreignArtistId,
@@ -77,28 +77,40 @@ def add_artist(artistName,foreignArtistId):
 		log.error("{} Not found, Not added to Lidarr.".format(artistName))
 		return
 
+def get_artist_id(artist):
+	url = 'https://api.lidarr.audio/api/v0.4/search?type=artist&query="{}"'.format(artist)
+	headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
+	rsp = requests.get(url, headers=headers)
+	
+	if rsp.text =="[]":	log.error("Sorry. We couldn't find {}".format(artist));	return None
+	
+	d = json.loads(rsp.text)
+	if rsp.status_code == 200: 
+		try: return d[0]['id']
+		except Exception as e: return d['id']
+	else: 
+		return None
+
 def main():
 	# print('\033c')
 	global artist_exist_count
 	if sys.version_info[0] < 3: log.error("Must be using Python 3"); sys.exit(-1)
 	if len(sys.argv)<2: log.error("No list Specified... Bye!!"); sys.exit(-1)
 	if not os.path.exists(sys.argv[1]):
-		log.info("{} Does Not Exist".format(sys.argv[1]));
+		log.info("{} Does Not Exist".format(sys.argv[1]))
 		sys.exit(-1)
-
+	
+	with open(sys.argv[1], encoding="utf8") as csvfile: total_count = len(list(csv.DictReader(csvfile)))
 	with open(sys.argv[1]) as csvfile:
-		m = csv.reader(csvfile)
-		s = sorted(m, key=lambda row:(row), reverse=False)
-		total_count = len(s)
-		if not total_count>0:
-			log.error("No Artists Found in file... Bye!!");
-			sys.exit()
+		m = csv.DictReader(csvfile)
+		if not total_count>0: log.error("No Artists Found in file... Bye!!"); sys.exit()
 		log.info("Found {} Artists in {}. :)".format(total_count,sys.argv[1]))
-		for row in s:
+		for row in m:
 			if not (row): continue
-			num_cols = len(row)
-			if num_cols == 2: artist, foreignArtistId = row
-			else: log.error("There was an error reading {} Details".format(title))
+			try: row['artist']
+			except: log.error("Invalid CSV File, Header does not contain artist header."); sys.exit(-1)
+			artist  = row['artist']; foreignArtistId = row['foreignArtistId']
+			if foreignArtistId == None: foreignArtistId = get_artist_id(artist)
 			try: add_artist(artist, foreignArtistId)
 			except Exception as e: log.error(e); sys.exit(-1)
 	log.info("Added {} of {} Artists, {} Already Exist".format(artist_added_count,total_count,artist_exist_count))
