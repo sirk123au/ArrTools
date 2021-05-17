@@ -61,7 +61,8 @@ def add_artist(artistName,foreignArtistId):
 		"Path": os.path.join(rootfolderpath,artistName) ,
 		"albumFolder": True ,
 		"RootFolderPath" : rootfolderpath,
-		"monitored": True
+		"monitored": True,
+		"addOptions": {"searchForMissingAlbums" : False}
 		})
 	url = '{}/api/v1/artist'.format(baseurl)
 	headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
@@ -82,7 +83,12 @@ def get_artist_id(artist):
 	headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
 	rsp = requests.get(url, headers=headers)
 	
-	if rsp.text =="[]":	log.error("Sorry. We couldn't find {}".format(artist));	return None
+	if rsp.text =="[]":	
+		log.error("Sorry. We couldn't find {}".format(artist))
+		fo = open("not_found.txt", "a+")
+		fo.write("{}\n".format(artist))
+		fo.close
+		return None
 	
 	d = json.loads(rsp.text)
 	if rsp.status_code == 200: 
@@ -111,6 +117,7 @@ def main():
 			except: log.error("Invalid CSV File, Header does not contain artist header."); sys.exit(-1)
 			artist  = row['artist']; foreignArtistId = row['foreignArtistId']
 			if foreignArtistId == None: foreignArtistId = get_artist_id(artist)
+			if foreignArtistId == None: continue
 			try: add_artist(artist, foreignArtistId)
 			except Exception as e: log.error(e); sys.exit(-1)
 	log.info("Added {} of {} Artists, {} Already Exist".format(artist_added_count,total_count,artist_exist_count))
