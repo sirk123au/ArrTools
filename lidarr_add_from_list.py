@@ -77,8 +77,8 @@ def add_artist(artistName,foreignArtistId):
 			log.info("{} already Exists in Lidarr.".format(artistName))
 			return
 		else:
-			log.error("URL ->{} Status Code ->{}".format(url,rsp.status_code))
 			log.error("{} Not found, Not added to Lidarr.".format(artistName))
+			log.error("URL -> {} Status Code -> {}".format(url,rsp.status_code))
 			return
 	else:
 		artist_exist_count +=1
@@ -118,7 +118,10 @@ def main():
 	rsp = requests.get(url , headers=headers)
 	if rsp.status_code == 200:
 		LidarrData = json.loads(rsp.text)
+	elif rsp.status_code == 401:
+		log.error("Failed to connect to Lidarr Unauthorized. Check api_key in config."); sys.exit(-1)
 	else:
+		log.error("URL -> {} Status Code -> {}".format(url,rsp.status_code))
 		log.error("Failed to connect to Lidarr..."); sys.exit(-1)
 
 	with open(sys.argv[1], encoding="utf8") as csvfile: total_count = len(list(csv.DictReader(csvfile)))
