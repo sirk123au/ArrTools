@@ -52,30 +52,37 @@ log = logging.getLogger("app." + __name__)
 
 def add_artist(artistName,foreignArtistId):
 	global artist_exist_count, artist_added_count
-	#log.info("Adding {} to Lidarr.".format(artistName))
-	data = json.dumps({
-		"artistName" : artistName ,
-		"foreignArtistId" : foreignArtistId,
-		"QualityProfileId" : 1,
-		"MetadataProfileId" : 1,
-		"Path": os.path.join(rootfolderpath,artistName) ,
-		"albumFolder": True ,
-		"RootFolderPath" : rootfolderpath,
-		"monitored": True,
-		"addOptions": {"searchForMissingAlbums" : False}
-		})
-	url = '{}/api/v1/artist'.format(baseurl)
-	headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
-	rsp = requests.post(url, headers=headers, data=data)
-	if rsp.status_code == 201:
-		artist_added_count +=1
-		log.info("{} Added to Lidarr :)".format(artistName))
-	elif rsp.status_code == 400:
+	artistIds = []
+	for artist_to_add in LidarrData: artistIds.append(artist_to_add.get('id')) 
+	if foreignArtistId not in artistIds:
+		data = json.dumps({
+			"artistName" : artistName ,
+			"foreignArtistId" : foreignArtistId,
+			"QualityProfileId" : 1,
+			"MetadataProfileId" : 1,
+			"Path": os.path.join(rootfolderpath,artistName) ,
+			"albumFolder": True ,
+			"RootFolderPath" : rootfolderpath,
+			"monitored": False,
+			"addOptions": {"searchForMissingAlbums" : False}
+			})
+		url = '{}/api/v1/artist'.format(baseurl)
+		headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
+		rsp = requests.post(url, headers=headers, data=data)
+		if rsp.status_code == 201:
+			artist_added_count +=1
+			log.info("{} Added to Lidarr :)".format(artistName))
+		elif rsp.status_code == 400:
+			artist_exist_count +=1
+			log.info("{} already Exists in Lidarr.".format(artistName))
+			return
+		else:
+			log.error("URL ->{} Status Code ->{}".format(url,rsp.status_code))
+			log.error("{} Not found, Not added to Lidarr.".format(artistName))
+			return
+	else:
 		artist_exist_count +=1
 		log.info("{} already Exists in Lidarr.".format(artistName))
-		return
-	else:
-		log.error("{} Not found, Not added to Lidarr.".format(artistName))
 		return
 
 def get_artist_id(artist):
@@ -100,12 +107,20 @@ def get_artist_id(artist):
 def main():
 	# print('\033c')
 	global artist_exist_count
+	global LidarrData
+
 	if sys.version_info[0] < 3: log.error("Must be using Python 3"); sys.exit(-1)
 	if len(sys.argv)<2: log.error("No list Specified... Bye!!"); sys.exit(-1)
-	if not os.path.exists(sys.argv[1]):
-		log.info("{} Does Not Exist".format(sys.argv[1]))
-		sys.exit(-1)
-	
+	if not os.path.exists(sys.argv[1]): log.info("{} Does Not Exist".format(sys.argv[1]));sys.exit(-1)
+	log.info("Downloading Lidarr Artist Data. :)")
+	headers = {"Content-type": "application/json", "X-Api-Key": api_key }
+	url = "{}/api/v1/artist".format(baseurl)
+	rsp = requests.get(url , headers=headers)
+	if rsp.status_code == 200:
+		LidarrData = json.loads(rsp.text)
+	else:
+		log.error("Failed to connect to Lidarr..."); sys.exit(-1)
+
 	with open(sys.argv[1], encoding="utf8") as csvfile: total_count = len(list(csv.DictReader(csvfile)))
 	with open(sys.argv[1]) as csvfile:
 		m = csv.DictReader(csvfile)
