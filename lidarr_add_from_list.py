@@ -63,7 +63,7 @@ def add_artist(artistName,foreignArtistId):
 			"Path": os.path.join(rootfolderpath,artistName) ,
 			"albumFolder": True ,
 			"RootFolderPath" : rootfolderpath,
-			"monitored": False,
+			"monitored": True,
 			"addOptions": {"searchForMissingAlbums" : False}
 			})
 		url = '{}/api/v1/artist'.format(baseurl)
