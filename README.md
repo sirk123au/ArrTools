@@ -2,9 +2,9 @@
 
 *radarr_add_from_list.py* Add Movies from a csv formatted file.
 
-*sonarr_add_from_list.py* Add Movies from a csv formatted file.
+*sonarr_add_from_list.py* Add Shows from a csv formatted file.
 
-*lidarr_add_from_list.py* Add Artist from a csv formatted file.
+*lidarr_add_from_list.py* Add Artists from a csv formatted file.
 
 *radarr_remove_downloaded.py* Removes already downloaded movies and removes their entries from Radarr.
 
