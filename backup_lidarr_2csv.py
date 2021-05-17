@@ -15,6 +15,7 @@ with open('./lidarr_backup.csv', 'w', newline='') as csvfile:
     rsp = requests.get(url , headers=headers)
     if rsp.status_code == 200:
         lidarrData = json.loads(rsp.text)
+        csvwriter.writerow(['artist','foreignArtistId'])
         for d in lidarrData:
             artist = re.sub(r'[^a-zA-Z0-9 ]',r'', d['artistName']) 
             csvwriter.writerow([artist, d.get('foreignArtistId')])
