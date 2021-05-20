@@ -1,4 +1,5 @@
 ## Radarr and Sonarr Tools
+[![Github Sponsorship](https://img.shields.io/badge/support-me-red.svg)](https://github.com/users/sirk123au/sponsorship)
 
 *radarr_add_from_list.py* Add Movies from a csv formatted file.
 
@@ -104,7 +105,7 @@ tvdb_username =
 [lidarr]
 api_key = 
 baseurl = http://localhost:8686
-rootfolderpath = D:\music
+rootfolderpath = 
 
 
 Standard Profile ID
