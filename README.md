@@ -91,7 +91,7 @@ omdbapi_key =  sign up here for free api key http://www.omdbapi.com/apikey.aspx
 
 [sonarr]
 api_key = Sonarr Api Key 
-baseurl = http://localhost:8787
+baseurl = http://localhost:8989
 urlbase = ; Include URL Base if you have it enabled
 rootfolderpath = Show Root Path (trailing slash is needed eg. /media/shows/ or d:\media\shows\)
 searchForShow = 
