@@ -82,7 +82,7 @@ Rename config_example.ini and add your details
 ```
 [radarr]
 api_key = Radarr Api Key
-baseurl = Radarr Base Url
+baseurl = http://localhost:7878 Radarr Base Url
 urlbase = ; Include URL Base if you have it enabled
 rootfolderpath = Movie Root Path (trailing slash is needed eg. /media/Movies/ or d:\media\Movies\)
 searchForMovie = Enable forced search
@@ -90,8 +90,8 @@ qualityProfileId =
 omdbapi_key =  sign up here for free api key http://www.omdbapi.com/apikey.aspx
 
 [sonarr]
-api_key = 
-baseurl = 
+api_key = Sonarr Api Key 
+baseurl = http://localhost:8787
 urlbase = ; Include URL Base if you have it enabled
 rootfolderpath = Show Root Path (trailing slash is needed eg. /media/shows/ or d:\media\shows\)
 searchForShow = 
