@@ -75,7 +75,7 @@ def add_movie(title, year, imdbid):
 		if not qualityProfileId.isdigit(): 
 			ProfileId = get_profile_from_id(qualityProfileId) 
 		elif qualityProfileId is None: 
-			log.error("\u001b[35m qualityProfileId Not Set in the config correctly.\u001b[0m")
+			log.error("\u001b[35m qualityProfileId Not Set in the config correctly.\u001b[0m"); sys.exit(-1)
 		elif match_profile_id(qualityProfileId) == True:
 			ProfileId = qualityProfileId
 		headers = {"Content-type": "application/json", 'Accept':'application/json'}
