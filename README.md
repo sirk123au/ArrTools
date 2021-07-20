@@ -120,4 +120,4 @@ Thanks for the support :)
 
 [![Github Sponsorship](https://img.shields.io/badge/support-me-red.svg)](https://github.com/users/sirk123au/sponsorship)
 
-<a href="https://www.buymeacoffee.com/Sirk123au" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+<script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#29abe0', 'M4M25DUMM');kofiwidget2.draw();</script> 
