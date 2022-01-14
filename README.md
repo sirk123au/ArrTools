@@ -82,7 +82,7 @@ Rename config_example.ini and add your details
 ```
 [radarr]
 api_key = Radarr Api Key
-baseurl = Radarr Base Url
+baseurl = http://localhost:7878 Radarr Base Url
 urlbase = ; Include URL Base if you have it enabled
 rootfolderpath = Movie Root Path (trailing slash is needed eg. /media/Movies/ or d:\media\Movies\)
 searchForMovie = Enable forced search
@@ -90,8 +90,8 @@ qualityProfileId =
 omdbapi_key =  sign up here for free api key http://www.omdbapi.com/apikey.aspx
 
 [sonarr]
-api_key = 
-baseurl = 
+api_key = Sonarr Api Key 
+baseurl = http://localhost:8989
 urlbase = ; Include URL Base if you have it enabled
 rootfolderpath = Show Root Path (trailing slash is needed eg. /media/shows/ or d:\media\shows\)
 searchForShow = 
@@ -120,4 +120,4 @@ Thanks for the support :)
 
 [![Github Sponsorship](https://img.shields.io/badge/support-me-red.svg)](https://github.com/users/sirk123au/sponsorship)
 
-<a href="https://www.buymeacoffee.com/Sirk123au" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/M4M25DUMM)
