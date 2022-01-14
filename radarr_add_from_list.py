@@ -59,9 +59,9 @@ def add_movie(title, year, imdbid):
 	global movie_exist_count
 	global ProfileId
 
-	if year == "": year = get_year(imdbid)
-	if imdbid == None: imdbid = get_imdbid(title,year)
-	if imdbid == None: log.error("Failed to get imdbid for {} {}.".format(title,year)); return
+	if year == "": year = get_year(title)
+	if imdbid == "": imdbid = get_imdbid(title,year)
+	if imdbid == "": log.error("Failed to get imdbid for {} {}.".format(title,year)); return
 	
 	# Store Radarr Server imdbid for faster matching
 	movieIds = []
@@ -79,7 +79,7 @@ def add_movie(title, year, imdbid):
 		elif match_profile_id(qualityProfileId) == True:
 			ProfileId = qualityProfileId
 		headers = {"Content-type": "application/json", 'Accept':'application/json'}
-		url = "{}{}/api/movie/lookup/imdb?imdbId={}&apikey={}".format(baseurl,urlbase, imdbid, api_key)
+		url = "{}{}/api/v3/movie/lookup/imdb?imdbId={}&apikey={}".format(baseurl,urlbase, imdbid, api_key)
 		rsp = session.get(url, headers=headers)
 		if len(rsp.text)==0: 
 			log.error("\u001b[35mSorry. We couldn't find any movies matching {} ({})\u001b[0m".format(title,year))
@@ -121,7 +121,7 @@ def add_movie(title, year, imdbid):
 	
 	elif imdbid == None:
 		# Search by Movie Title in Radarr
-		url = "{}{}/api/movie/lookup?term={}&apikey={}".format(baseurl,urlbase, title.replace(" ","%20"), api_key)
+		url = "{}{}/api/v3/movie/lookup?term={}&apikey={}".format(baseurl,urlbase, title.replace(" ","%20"), api_key)
 		rsp = requests.get(url, headers=headers)
 		data = json.loads(rsp.text)
 		if rsp.text =="[]":
@@ -147,7 +147,7 @@ def add_movie(title, year, imdbid):
 				})
 			# Add Movie To Radarr
 			headers = {"Content-type": "application/json", 'Accept':'application/json', "X-Api-Key": api_key}
-			url = '{}{}/api/movie'.format(baseurl,urlbase)
+			url = '{}{}/api/v3/movie'.format(baseurl,urlbase)
 			rsp = requests.post(url, headers=headers, data=Rdata)
 			if rsp.status_code == 201:
 				movie_added_count +=1
@@ -170,7 +170,7 @@ def add_movie(title, year, imdbid):
 
 def get_profile_from_id(id): 
     headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
-    url = "{}{}/api/profile".format(baseurl,urlbase)
+    url = "{}{}/api/v3/qualityProfile".format(baseurl,urlbase)
     r = requests.get(url, headers=headers)
     d = json.loads(r.text)
     profile = next((item for item in d if item["name"].lower() == id.lower()), False)
@@ -181,7 +181,7 @@ def get_profile_from_id(id):
 
 def match_profile_id(id): 
     headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
-    url = "{}{}/api/profile".format(baseurl,urlbase)
+    url = "{}{}/api/v3/qualityProfile".format(baseurl,urlbase)
     r = requests.get(url, headers=headers)
     d = json.loads(r.text)
     profile = next((item for item in d if item["name"].lower() == id.lower()), False)
@@ -208,7 +208,7 @@ def get_imdbid(title,year):
 def get_year(imdbid):
 	# Get Movie Year 
 	headers = {"Content-type": "application/json", 'Accept':'application/json'}
-	r = requests.get("https://www.omdbapi.com/?i={}&apikey={}".format(imdbid,omdbapi_key), headers=headers)
+	r = requests.get("https://www.omdbapi.com/?t={}&apikey={}".format(imdbid,omdbapi_key), headers=headers)
 	if r.status_code == 401:
 		log.error("omdbapi Request limit reached!")
 	d = json.loads(r.text)
@@ -229,7 +229,7 @@ def main():
 	if not os.path.exists(sys.argv[1]): log.error("{} Does Not Exist".format(sys.argv[1])); sys.exit(-1)
 	log.info("Downloading Radarr Movie Data. :)")
 	headers = {"Content-type": "application/json", "X-Api-Key": api_key }
-	url = "{}{}/api/movie".format(baseurl,urlbase)
+	url = "{}{}/api/v3/movie".format(baseurl,urlbase)
 	rsp = requests.get(url , headers=headers)
 	if rsp.status_code == 200:
 		RadarrData = json.loads(rsp.text)
