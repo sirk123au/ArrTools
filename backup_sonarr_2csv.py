@@ -11,7 +11,7 @@ with open('./sonarr_backup.csv', 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile, delimiter=',')
     print("Downloading Data...")
     headers = {"Content-type": "application/json", "X-Api-Key": api_key }
-    url = "{}/api/series".format(baseurl)
+    url = "{}/api/v3/series".format(baseurl)
     rsp = requests.get(url , headers=headers)
     csvwriter.writerow(['title','year','imdbid'])
     if rsp.status_code == 200:

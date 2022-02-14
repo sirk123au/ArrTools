@@ -85,7 +85,7 @@ def add_show(title,year,imdbid):
             ProfileId = qualityProfileId
         
         headers = {"Content-type": "application/json"}
-        url = "{}{}/api/series/lookup?term=tvdb:{}&apikey={}".format(baseurl,urlbase,tvdbId, api_key )
+        url = "{}{}/api/v3/series/lookup?term=tvdb:{}&apikey={}".format(baseurl,urlbase,tvdbId, api_key )
         rsp = session.get(url, headers=headers)
         data = json.loads(rsp.text)
         if rsp.text =="[]":
@@ -121,7 +121,7 @@ def add_show(title,year,imdbid):
 
             })
         
-        url = '{}{}/api/series'.format(baseurl,urlbase)
+        url = '{}{}/api/v3/series'.format(baseurl,urlbase)
         rsp = requests.post(url, headers=headers, data=data)
         data = json.loads(rsp.text)
 
@@ -186,7 +186,7 @@ def get_tvdbId(title,imdbid):
 
 def get_profile_from_id(id): 
     headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
-    url = "{}{}/api/profile".format(baseurl,urlbase)
+    url = "{}{}/api/v3/profile".format(baseurl,urlbase)
     r = requests.get(url, headers=headers)
     d = json.loads(r.text)
     profile = next((item for item in d if item["name"].lower() == id.lower()), False)
@@ -204,7 +204,7 @@ def main():
     if not os.path.exists(sys.argv[1]): log.info("{} Does Not Exist".format(sys.argv[1])); sys.exit(-1)
     log.info("Downloading Sonarr Show Data. :)")
     headers = {"Content-type": "application/json", "X-Api-Key": api_key }
-    url = "{}{}/api/series".format(baseurl,urlbase)
+    url = "{}{}/api/v3/series".format(baseurl,urlbase)
     rsp = requests.get(url , headers=headers)
     if rsp.status_code == 200:
         sonarrData = json.loads(rsp.text)
