@@ -110,7 +110,7 @@ def add_movie(title, year, imdbid):
 			return
 		# Add Movie To Radarr
 		headers = {"Content-type": "application/json", 'Accept':'application/json', "X-Api-Key": api_key}
-		url = '{}{}/api/movie'.format(baseurl,urlbase)
+		url = '{}{}/api/v3/movie'.format(baseurl,urlbase)
 		rsp = requests.post(url, headers=headers, data=Rdata)
 		if rsp.status_code == 201:
 			movie_added_count +=1
