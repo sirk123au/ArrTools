@@ -15,8 +15,8 @@ with open('./sonarr_backup.csv', 'w', newline='') as csvfile:
     rsp = requests.get(url , headers=headers)
     csvwriter.writerow(['title','year','imdbid'])
     if rsp.status_code == 200:
-        RadarrData = json.loads(rsp.text)
-        for d in RadarrData: csvwriter.writerow([d['title'],d['year'], d.get('imdbId')])
+        radarr_data = json.loads(rsp.text)
+        for d in radarr_data: csvwriter.writerow([d['title'], d['year'], d.get('imdbId')])
     else:
         print("Failed to connect to Radar...")
 print("Done...")
