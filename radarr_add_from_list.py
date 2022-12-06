@@ -316,9 +316,9 @@ def main():
     else:
         log.error("Failed to connect to Radarr...")
 
-    with open(sys.argv[1], encoding="utf8") as csvfile:
+    with open(sys.argv[1], encoding="ISO-8859-1", errors='ignore') as csvfile:
         total_count = len(list(csv.DictReader(csvfile)))
-    with open(sys.argv[1], encoding="utf8") as csvfile:
+    with open(sys.argv[1], encoding="ISO-8859-1", errors='ignore') as csvfile:
         movies_list = csv.DictReader(csvfile)
         if not total_count > 0:
             log.error("No movies found in CSV file.")
