@@ -86,9 +86,10 @@ def add_movie(title, year, imdbid):
         ProfileId = quality_profile_id
 
     if imdbid is None:
+        log.info(f"Cannot find IMDbId for {title}, attempting to add without it...")
         # Search by Movie Title in Radarr
         headers = {"Content-type": "application/json", 'Accept': 'application/json'}
-        url = "{}{}/api/v3/movie/lookup?term={}&apikey={}".format(baseurl, urlbase, title.replace(" ", "%20"), api_key)
+        url = f"{baseurl}{urlbase}/api/v3/movie/lookup?term={title.replace(' ', '%20')}&apikey={api_key}"
         radarr_api_response = requests.get(url, headers=headers)
         data = json.loads(radarr_api_response.text)
         if radarr_api_response.text == "[]":
@@ -116,8 +117,10 @@ def add_movie(title, year, imdbid):
             headers = {"Content-type": "application/json", 'Accept': 'application/json', "X-Api-Key": api_key}
             url = f'{baseurl}{urlbase}/api/v3/movie'
             radarr_api_response = requests.post(url, headers=headers, data=movie_data)
+            log.debug(f"Radarr response: {radarr_api_response.status_code}: {radarr_api_response.text}")
             if radarr_api_response.status_code == 201:
                 movie_added_count += 1
+                # TODO: Remove unicode characters for colours, replace with a module
                 if searchForMovie:
                     log.info(
                         f"\u001b[36mtm{tmdbid}\t         \u001b[0m{title} ({year}) \u001b[32mAdded to Radarr :) "
@@ -136,6 +139,7 @@ def add_movie(title, year, imdbid):
             return
 
     elif imdbid not in current_movie_ids:
+        log.info(f"Found IMDbId for {title} - attempting to add to Radarr...")
         # Build json Data to import into radarr
         session = requests.Session()
         adapter = requests.adapters.HTTPAdapter(max_retries=20)
@@ -143,7 +147,7 @@ def add_movie(title, year, imdbid):
         session.mount('http://', adapter)
 
         headers = {"Content-type": "application/json", 'Accept': 'application/json'}
-        url = "{}{}/api/v3/movie/lookup/imdb?imdbId={}&apikey={}".format(baseurl, urlbase, imdbid, api_key)
+        url = f"{baseurl}{urlbase}/api/v3/movie/lookup/imdb?imdbId={imdbid}&apikey={api_key}"
         radarr_api_response = session.get(url, headers=headers)
         if len(radarr_api_response.text) == 0:
             log.error(f"\u001b[35mSorry. We couldn't find any movies matching {title} ({year})\u001b[0m")
@@ -167,19 +171,22 @@ def add_movie(title, year, imdbid):
                 "images":              images,
                 "addOptions":          {"searchForMovie": searchForMovie}})
         elif radarr_api_response.status_code == 404:
-            log.error(f"\u001b[36m{imdbid}\t \u001b[0m{title} ({year}) Movie not found... unable to add to Radarr")
+            log.error(f"\u001b[36m{imdbid}\t \u001b[0m{title} ({year}) Movie not found... unable to add to Radarr\n")
             return
         elif radarr_api_response.status_code == 500:
-            log.error(f"\u001b[36m{imdbid}\t \u001b[0m{title} ({year}) Can't find TMDB ID - movie may have been removed!"
-                      f"")
+            log.error(f"\u001b[36m{imdbid}\t \u001b[0m{title} ({year}) Can't find TMDB ID - movie may have been "
+                      f"removed!\n")
+            return
         else:
             log.error("Something else has happened.")
             return
         # Add Movie To Radarr
         headers = {"Content-type": "application/json", 'Accept': 'application/json', "X-Api-Key": api_key}
-        url = '{}{}/api/v3/movie'.format(baseurl, urlbase)
+        url = f'{baseurl}{urlbase}/api/v3/movie'
         radarr_api_response = requests.post(url, headers=headers, data=movie_data)
+        log.debug(f"Radarr response: {radarr_api_response.status_code}: {radarr_api_response.text}")
         if radarr_api_response.status_code == 201:
+            log.debug("Connected to Radarr!")
             movie_added_count += 1
             if searchForMovie:  # Check If you want to force download search
                 log.info(
@@ -191,7 +198,7 @@ def add_movie(title, year, imdbid):
                     f"Disabled.\u001b[0m\n")
     else:
         movie_exist_count += 1
-        log.info("\u001b[36m{}\t \u001b[0m{} ({}) already Exists in Radarr.".format(imdbid, title, year))
+        log.info(f"\u001b[36m{imdbid}\t \u001b[0m{title} ({year}) already exists in Radarr!\n")
         return
 
 
@@ -203,8 +210,8 @@ functions
     :rtype: list
     """
     log.info("Getting quality profiles...")
-    headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
-    url = "{}{}/api/v3/qualityProfile".format(baseurl, urlbase)
+    headers = {"Content-type": "application/json", "X-Api-Key": f"{api_key}"}
+    url = f"{baseurl}{urlbase}/api/v3/qualityProfile"
     r = requests.get(url, headers=headers)
     profiles_json = json.loads(r.text)
     return profiles_json
@@ -219,7 +226,7 @@ Allows the user to select a quality profile ID at runtime using console input
     """
     selected = False
     profile_choice = -1
-
+    # TODO: Find a way to make this call only happen once per run
     quality_profiles = get_quality_profiles()
     print("\nPlease enter a valid profile ID:")
     for profile in quality_profiles:
@@ -261,7 +268,7 @@ Uses OMDB to return the IMDB ID (ttXXXXXXX) of a movie
     r = requests.get(f"https://www.omdbapi.com/?t={parsed_movie_title}&y={year}&type=movie&apikey={omdbapi_key}",
                      headers=headers)
     if r.status_code == 401:
-        log.error("omdbapi Request limit reached!")
+        log.error("OMDb API Request limit reached!")
     d = json.loads(r.text)
     if r.status_code == 200:
         if d.get('Response') == "False":
@@ -282,7 +289,7 @@ Uses OMDB to check the year that a given movie released
     headers = {"Content-type": "application/json", 'Accept': 'application/json'}
     r = requests.get(f"https://www.omdbapi.com/?t={imdbid}&apikey={omdbapi_key}", headers=headers)
     if r.status_code == 401:
-        log.error("omdbapi Request limit reached!")
+        log.error("OMDb API Request limit reached!")
     d = json.loads(r.text)
     if r.status_code == 200:
         if d.get('Response') == "False":
@@ -301,32 +308,33 @@ def main():
         log.error("Must be using Python 3")
         sys.exit(-1)
     if len(sys.argv) < 2:
-        log.error("No list Specified... Bye!!")
+        log.error("No CSV file specified... bye!!")
         sys.exit(-1)
     if not os.path.exists(sys.argv[1]):
-        log.error("{} Does Not Exist".format(sys.argv[1]))
+        log.error(f"{sys.argv[1]} does not exist!")
         sys.exit(-1)
 
     log.info("Downloading Radarr Movie Data. :)")
     headers = {"Content-type": "application/json", "X-Api-Key": api_key}
-    url = "{}{}/api/v3/movie".format(baseurl, urlbase)
+    url = f"{baseurl}{urlbase}/api/v3/movie"
     rsp = requests.get(url, headers=headers)
     if rsp.status_code == 200:
         RadarrData = json.loads(rsp.text)
     else:
         log.error("Failed to connect to Radarr...")
 
-    with open(sys.argv[1], encoding="utf8") as csvfile:
+    log.info(f"Loading {sys.argv[1]}...")
+    with open(sys.argv[1], encoding="ISO-8859-1", errors='ignore') as csvfile:
         total_count = len(list(csv.DictReader(csvfile)))
-    with open(sys.argv[1], encoding="utf8") as csvfile:
+    with open(sys.argv[1], encoding="ISO-8859-1", errors='ignore') as csvfile:
         movies_list = csv.DictReader(csvfile)
         if not total_count > 0:
             log.error("No movies found in CSV file.")
             exit()
         if movies_list.fieldnames != ["title", "year", "imdbid"]:
-            log.error("Invalid CSV File, Header does not contain title,year,imdbid")
+            log.error("Invalid CSV file - header does not contain title,year,imdbid")
             sys.exit(-1)
-        log.info("Found {} Movies in {}. :)".format(total_count, sys.argv[1]))
+        log.info(f"Found {total_count} movies in {sys.argv[1]} :)")
         for row in movies_list:
             title = row['title']
             year = row['year']
@@ -336,7 +344,7 @@ def main():
             except Exception as e:
                 log.error(e)
                 sys.exit(-1)
-    log.info("Added {} of {} Movies, {} already exists. ;)".format(movie_added_count, total_count, movie_exist_count))
+    log.info(f"Added {movie_added_count} of {total_count} movies - {movie_exist_count} already existed ;)")
 
 
 if __name__ == "__main__":
