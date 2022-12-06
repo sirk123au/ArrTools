@@ -85,7 +85,6 @@ def add_movie(title, year, imdbid):
     elif match_profile_id(quality_profile_id):
         ProfileId = quality_profile_id
 
-
     if imdbid is None:
         log.info(f"Cannot find IMDbId for {title}, attempting to add without it...")
         # Search by Movie Title in Radarr
@@ -177,6 +176,7 @@ def add_movie(title, year, imdbid):
         elif radarr_api_response.status_code == 500:
             log.error(f"\u001b[36m{imdbid}\t \u001b[0m{title} ({year}) Can't find TMDB ID - movie may have been "
                       f"removed!\n")
+            return
         else:
             log.error("Something else has happened.")
             return
