@@ -198,7 +198,7 @@ def add_movie(title, year, imdbid):
                     f"Disabled.\u001b[0m\n")
     else:
         movie_exist_count += 1
-        log.info(f"\u001b[36m{imdbid}\t \u001b[0m{title} ({year}) already exists in Radarr!\n")
+        log.info(f"\u001b[36m{imdbid}\t \u001b[0m{title} ({year}) already exists in Radarr!")
         return
 
 
@@ -209,7 +209,7 @@ functions
     :return: The server's quality profiles as a list
     :rtype: list
     """
-    log.info("Getting quality profiles...")
+    #log.info("Getting quality profiles...")
     headers = {"Content-type": "application/json", "X-Api-Key": f"{api_key}"}
     url = f"{baseurl}{urlbase}/api/v3/qualityProfile"
     r = requests.get(url, headers=headers)
@@ -247,9 +247,12 @@ Checks if a given quality profile ID matches with one from the API.
     :return: Returns true if the quality profile is matched/found
     """
     profiles = get_quality_profiles()
-    profile = next((p for p in profiles if p["id"] == int(quality_id)), False)
+    if type(quality_id) == int or type(quality_id) == float:
+        profile = next((p for p in profiles if p["id"] == int(quality_id)), False)
+    else:
+        profile = next((p for p in profiles if p["name"] == quality_id), False)
     if not profile:
-        log.error(f'Could not find profile_id for instance profile ID f"{quality_id}"')
+        log.error(f'Could not find profile_id for instance profile ID: {quality_id}')
         sys.exit(0)
     return True
 
@@ -342,7 +345,9 @@ def main():
             try:
                 add_movie(title, year, imdbid)
             except Exception as e:
-                log.error(e)
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                log.error(exc_type, fname, exc_tb.tb_lineno)
                 sys.exit(-1)
     log.info(f"Added {movie_added_count} of {total_count} movies - {movie_exist_count} already existed ;)")
 
