@@ -188,19 +188,22 @@ def add_movie(title, year, imdbid, quality_profile_id):
         log.info(f"{imdbid}\t {title} ({year}) already exists in Radarr!")
         return
 
-def get_profile_from_name(name :str):
+def get_profile_from_name(name :str) -> int:
     """
 Converts Profile Name -> ID
     :return: ID
     :type: any
     """  
-    if name.isdigit(): return name
-    profiles = quality_profiles
-    profile = next((item for item in profiles if item["name"] == name), False)
-    if not profile:
-        log.error(f"Could not find profile_id for instance profile ID {name}")
-        return select_profile_id()
-    return  profile.get('id')
+    try: 
+        number = int(name)
+        return name
+    except ValueError: 
+        profiles = quality_profiles
+        profile = next((item for item in profiles if item["name"] == name), False)
+        if not profile:
+            log.error(f"Could not find profile_id for instance profile ID {name}")
+            return select_profile_id()
+        return  profile.get('id')
 
 
 def get_quality_profiles() -> list:
