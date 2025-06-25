@@ -106,17 +106,17 @@ def add_show(title,year,imdbid):
             "year": year ,
             "tvdbId": tvdbId ,
             "titleslug": titleslug,
-            "monitored": 'true' ,
-            "seasonFolder": 'true',
+            "monitored": True ,
+            "seasonFolder": True,
             "qualityProfileId": ProfileId,
             "rootFolderPath": rootfolderpath ,
             "images": images,
             "seasons": seasons,
             "addOptions":
                         {
-                        "ignoreEpisodesWithFiles": "true",
-                        "ignoreEpisodesWithoutFiles": "false",
-                        "searchForMissingEpisodes": searchForShow
+                        "ignoreEpisodesWithFiles": True,
+                        "ignoreEpisodesWithoutFiles": False,
+                        "searchForMissingEpisodes": bool(searchForShow)
                         }
 
             })
@@ -133,7 +133,7 @@ def add_show(title,year,imdbid):
                 log.info("\033[0;32m{}\t {} ({}) Added to Sonarr :) \033[1;31mSearch Disabled.\u001b[0m".format(imdbid,title,year))
         elif rsp.status_code == 400:
             show_exist_count +=1
-            log.info("\033[1;36m}\t {} ({}) already Exists in Sonarr.\u001b[0m".format(imdbid,title,year))
+            log.info("\033[1;36m{}\t {} ({}) already Exists in Sonarr.\u001b[0m".format(imdbid,title,year))
             return
         else:
             log.error("\u001b[32m{}\t {} ({}) Not found, Not added to Sonarr.\u001b[0m".format(imdbid,title,year))
@@ -144,7 +144,7 @@ def add_show(title,year,imdbid):
         log.info("\033[1;36m{}\t {} ({}) already Exists in Sonarr.\u001b[0m".format(imdbid,title,year))
         return
 
-def get_imdbid(title,year,imdbid):
+def get_imdbid(title,year):
     # Get TV Show imdbid 
     headers = {"Content-type": "application/json", 'Accept':'application/json'}
     r = requests.get("https://www.omdbapi.com/?t={}&y={}&apikey={}".format(title,year,omdbapi_key), headers=headers)
@@ -163,10 +163,9 @@ def get_imdbid(title,year,imdbid):
 
 def get_tvdbId(title,imdbid):
     api = str(base64.b64decode('YWE2Yjc5YTBlZDdjM2Y3NWUyOWI1MjkyOTAyNjhmOGFkNzM0ZmE3MWUzYzA3Zjg2YmE2OTVlMzQzZDFmZmNjMw=='))
-    bearer = str(base64.b64decode('NTQ2NTc4MTc0ODY4YTllODUxMTFhYzZkYjg2ODg2MmNkMTU0MjU3MmY4ODE2M2I4ODZjNmJiMWVlMWE2NmMzNA=='))
     title = title.replace(" ","-"); title = title.replace("'","-"); title = title.replace(":","")
     if title.find("&"): title = title.replace(" ",""); title = title.replace("&","-")
-    headers = {'Content-Type': 'application/json', 'trakt-api-version': '2', 'trakt-api-key': api, 'Authorization': 'Bearer {}'.format(bearer)}
+    headers = {'Content-Type': 'application/json', 'trakt-api-version': '2', 'trakt-api-key': api}
     rsp = requests.get('https://api.trakt.tv/search/imdb/{}?type=show'.format(imdbid), headers=headers)
     if rsp.status_code == 403: log.error("trakt Api Failed"); return None
     if rsp.status_code == 200:
