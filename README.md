@@ -20,7 +20,7 @@ Using radarr_add_from_list/sonarr_add_from_list
 The input list file has to have the format. 
 It has to have MovieName/ShowName,Year,imdbid   **imdbid is Optional Makes it easer to find movie/TV show
 
-Use pip install -r requirments.txt to install the required python modules 
+Use pip install -r requirements.txt to install the required python modules 
 
 Movies CSV
 ```
