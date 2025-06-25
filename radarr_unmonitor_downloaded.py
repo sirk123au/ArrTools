@@ -43,13 +43,13 @@ print('\033c')
 if sys.version_info[0] < 3: log.error("Must be using Python 3"); sys.exit(-1)
 log.info("Downloading Radarr Movie Data...")
 headers = {"Content-type": "application/json", "X-Api-Key": api_key }
-url = "{}/api/movie".format(baseurl)
+url = "{}/api/v3/movie".format(baseurl)
 rsp = requests.get(url, headers=headers)
 data = json.loads(rsp.text)
 count = 0
 for i in data:
     headers = {"Content-type": "application/json", "X-Api-Key": api_key }
-    url = "{}/api/movie/{}".format(baseurl,i['id'])
+    url = "{}/api/v3/movie/{}".format(baseurl,i['id'])
     rsp = requests.get(url, headers=headers)
     if rsp.status_code == 200:
         if i['hasFile']: 
