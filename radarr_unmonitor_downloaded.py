@@ -63,6 +63,6 @@ for i in data:
                     url = '{}/api/movie'.format(baseurl)
                     rsp = requests.put(url, headers=headers, data=data)
                     if rsp.status_code == 201:
-                        count += count
+                        count += 1
                         log.info ("\u001b[36m{} ({})\u001b[0m Has been downloaded, \u001b[31mUnmonitoring....\u001b[0m".format(i['title'],i['year']))
 log.info ("Unmonitored {} Movies.".format(count))
