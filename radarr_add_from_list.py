@@ -326,10 +326,17 @@ def main():
     url = f"{baseurl}{urlbase}/api/v3/movie"
     rsp = requests.get(url, headers=headers)
     if rsp.status_code == 200:
+        if len(rsp.text) == 0:
+            log.error("No data downloaded from Radarr.")
+            sys.exit(-1)
         RadarrData = json.loads(rsp.text)
+        if not RadarrData:
+            log.error("No data downloaded from Radarr.")
+            sys.exit(-1)
         quality_profiles = get_quality_profiles()
     else:
         log.error("Failed to connect to Radarr...")
+        sys.exit(-1)
 
     log.info(f"Loading {sys.argv[1]}...")
     with open(sys.argv[1], encoding="ISO-8859-1", errors='ignore') as csvfile:
