@@ -73,6 +73,9 @@ Backstreet Boys,2f569e60-0a1b-4fb9-95a4-3dc1525d1aad
 
 ```
 
+If `foreignArtistId` is omitted, `lidarr_add_from_list.py` will attempt to
+retrieve the MusicBrainz ID automatically.
+
 Run the GUI with
 ```
 $ python3 arr_gui.py

@@ -136,6 +136,38 @@ def get_artist_id(artist: str, session: requests.Session) -> str | None:
             return data.get("id")
     return None
 
+
+def lookup_musicbrainz(artist: str, session: requests.Session) -> str | None:
+    """Query MusicBrainz directly for the artist MBID."""
+
+    url = "https://musicbrainz.org/ws/2/artist/"
+    params = {"query": f'artist:"{artist}"', "fmt": "json"}
+    headers = {
+        "User-Agent": "ArrTools (https://github.com/sirk123au/ArrTools)",
+    }
+
+    try:
+        rsp = session.get(url, headers=headers, params=params, timeout=10)
+    except requests.RequestException as exc:
+        log.error(f"Error searching MusicBrainz for {artist}: {exc}")
+        return None
+
+    if rsp.status_code != 200:
+        log.error(
+            f"MusicBrainz search failed for {artist}. Status: {rsp.status_code}"
+        )
+        return None
+
+    data = rsp.json()
+    artists = data.get("artists")
+    if not artists:
+        log.error(f"Sorry. We couldn't find {artist} on MusicBrainz")
+        with open("not_found.txt", "a+", encoding="utf-8") as fo:
+            fo.write(f"{artist}\n")
+        return None
+
+    return artists[0].get("id")
+
 def main() -> None:
     """Entry point for the script."""
 
@@ -189,6 +221,8 @@ def main() -> None:
             continue
         if not foreign_artist_id:
             foreign_artist_id = get_artist_id(artist, session)
+        if not foreign_artist_id:
+            foreign_artist_id = lookup_musicbrainz(artist, session)
         if not foreign_artist_id:
             continue
         try:
