@@ -6,11 +6,13 @@ import logging
 import logging.handlers
 import os
 import sys
-from datetime import datetime
 
 import configparser
 import requests
+from requests.adapters import HTTPAdapter, Retry
 from colorlog import ColoredFormatter
+
+LidarrData: list = []
 
 artist_added_count = 0
 artist_exist_count = 0
@@ -61,6 +63,16 @@ log = logging.getLogger("app." + __name__)
 
 ########################################################################################################################
 
+def create_session() -> requests.Session:
+    """Return a session with retry and backoff configured."""
+
+    retries = Retry(total=5, backoff_factor=1, status_forcelist=[500, 502, 503, 504], allowed_methods=["GET", "POST"])
+    session = requests.Session()
+    adapter = HTTPAdapter(max_retries=retries)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
+
 def add_artist(artist_name: str, foreign_artist_id: str, session: requests.Session) -> None:
     """Add an artist to Lidarr if it does not already exist."""
 
@@ -72,7 +84,7 @@ def add_artist(artist_name: str, foreign_artist_id: str, session: requests.Sessi
         log.info(f"{artist_name} already exists in Lidarr.")
         return
 
-    payload = json.dumps({
+    payload = {
         "artistName": artist_name,
         "foreignArtistId": foreign_artist_id,
         "QualityProfileId": 1,
@@ -82,10 +94,14 @@ def add_artist(artist_name: str, foreign_artist_id: str, session: requests.Sessi
         "RootFolderPath": rootfolderpath,
         "monitored": True,
         "addOptions": {"searchForMissingAlbums": False},
-    })
+    }
     url = f"{baseurl}/api/v1/artist"
     headers = {"Content-type": "application/json", "X-Api-Key": api_key}
-    rsp = session.post(url, headers=headers, data=payload)
+    try:
+        rsp = session.post(url, headers=headers, json=payload, timeout=10)
+    except requests.RequestException as exc:
+        log.error(f"Error adding {artist_name}: {exc}")
+        return
     if rsp.status_code == 201:
         artist_added_count += 1
         log.info(f"{artist_name} added to Lidarr :)")
@@ -100,7 +116,11 @@ def get_artist_id(artist: str, session: requests.Session) -> str | None:
 
     url = f"https://api.lidarr.audio/api/v0.4/search?type=artist&query=\"{artist}\""
     headers = {"Content-type": "application/json", "X-Api-Key": api_key}
-    rsp = session.get(url, headers=headers)
+    try:
+        rsp = session.get(url, headers=headers, timeout=10)
+    except requests.RequestException as exc:
+        log.error(f"Error searching for {artist}: {exc}")
+        return None
 
     if rsp.text == "[]":
         log.error(f"Sorry. We couldn't find {artist}")
@@ -131,15 +151,16 @@ def main() -> None:
         log.error(f"{sys.argv[1]} does not exist")
         sys.exit(-1)
 
-    session = requests.Session()
-    adapter = requests.adapters.HTTPAdapter(max_retries=5)
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
+    session = create_session()
 
     log.info("Downloading Lidarr artist data...")
     headers = {"Content-type": "application/json", "X-Api-Key": api_key}
     url = f"{baseurl}/api/v1/artist"
-    rsp = session.get(url, headers=headers)
+    try:
+        rsp = session.get(url, headers=headers, timeout=10)
+    except requests.RequestException as exc:
+        log.error(f"Error connecting to Lidarr: {exc}")
+        sys.exit(-1)
     if rsp.status_code == 200:
         LidarrData = json.loads(rsp.text)
     elif rsp.status_code == 401:
