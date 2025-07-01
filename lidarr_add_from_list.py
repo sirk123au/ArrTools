@@ -12,6 +12,8 @@ import requests
 from requests.adapters import HTTPAdapter, Retry
 from colorlog import ColoredFormatter
 
+LidarrData: list = []
+
 artist_added_count = 0
 artist_exist_count = 0
 
