@@ -16,6 +16,8 @@
 
 *get_imdbid.py* Matches the imdbd from a csv list MovieName/ShowName,Year for easy importing for the list import.
 
+*arr_gui.py* Standalone GUI to import or export data for Radarr, Sonarr or Lidarr.
+
 Using radarr_add_from_list/sonarr_add_from_list
 The input list file has to have the format. 
 It has to have MovieName/ShowName,Year,imdbid   **imdbid is Optional Makes it easer to find movie/TV show
@@ -71,12 +73,12 @@ Backstreet Boys,2f569e60-0a1b-4fb9-95a4-3dc1525d1aad
 
 ```
 
-when you run it use
+Run the GUI with
 ```
-$python3 radarr_add_from_list.py movielist.csv
-$python3 sonarr_add_from_list.py showlist.csv
-$python3 lidarr_add_from_list.py artist.csv
+$ python3 arr_gui.py
 ```
+The CLI scripts remain for advanced usage, but the GUI handles common import
+and export operations without calling them.
 Rename config_example.ini and add your details
 
 ```
@@ -102,9 +104,13 @@ tvdb_userkey =
 tvdb_username = 
 
 [lidarr]
-api_key = 
+api_key =
 baseurl = http://localhost:8686
-rootfolderpath = 
+rootfolderpath =
+
+[gui]
+# Optional default CSV path used by arr_gui.py
+default_csv =
 
 
 Standard Profile ID
