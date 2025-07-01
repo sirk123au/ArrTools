@@ -1,10 +1,19 @@
-import os, time, requests, logging, logging.handlers, json, sys, re, csv
-from colorlog import ColoredFormatter
-import configparser
+"""Add artists from a CSV list into Lidarr."""
+
+import csv
+import json
+import logging
+import logging.handlers
+import os
+import sys
 from datetime import datetime
 
-artist_added_count=0
-artist_exist_count=0
+import configparser
+import requests
+from colorlog import ColoredFormatter
+
+artist_added_count = 0
+artist_exist_count = 0
 
 # Config ###############################################################################################################
 
@@ -15,130 +24,161 @@ baseurl = config['lidarr']['baseurl']
 api_key = config['lidarr']['api_key']
 rootfolderpath = config['lidarr']['rootfolderpath']
 
-# Logging ##############################################################################################################
+# Logging ######################################################################
 
 logging.getLogger().setLevel(logging.NOTSET)
 
 formatter = ColoredFormatter(
-	"%(log_color)s[%(levelname)s]%(reset)s %(white)s%(message)s",
-	datefmt=None,
-	reset=True,
-	log_colors={
-		'DEBUG':    'cyan',
-		'INFO':     'green',
-		'WARNING':  'yellow',
-		'ERROR':    'red',
-		'CRITICAL': 'red,bg_white',
-	},
-	secondary_log_colors={},
-	style='%'
+    "%(log_color)s[%(levelname)s]%(reset)s %(white)s%(message)s",
+    datefmt=None,
+    reset=True,
+    log_colors={
+        'DEBUG': 'cyan',
+        'INFO': 'green',
+        'WARNING': 'yellow',
+        'ERROR': 'red',
+        'CRITICAL': 'red,bg_white',
+    },
+    secondary_log_colors={},
+    style="%",
 )
 
-logger = logging.StreamHandler()
-logger.setLevel(logging.INFO) # DEBUG To show all
-logger.setFormatter(formatter)
-logging.getLogger().addHandler(logger)
-if not os.path.exists("./logs/"): os.mkdir("./logs/")
-logFileName =  "./logs/lafl.log"#.format(datetime.now().strftime("%Y-%m-%d-%H.%M.%S"))
-filelogger = logging.handlers.RotatingFileHandler(filename=logFileName)
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+console.setFormatter(formatter)
+logging.getLogger().addHandler(console)
+
+if not os.path.exists("./logs"):
+    os.mkdir("./logs")
+log_file_name = "./logs/lafl.log"
+filelogger = logging.handlers.RotatingFileHandler(filename=log_file_name)
 filelogger.setLevel(logging.DEBUG)
-logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
-filelogger.setFormatter(logFormatter)
+log_formatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
+filelogger.setFormatter(log_formatter)
 logging.getLogger().addHandler(filelogger)
 
 log = logging.getLogger("app." + __name__)
 
 ########################################################################################################################
 
-def add_artist(artistName,foreignArtistId):
-	global artist_exist_count, artist_added_count
-	artistIds = []
-	for artist_to_add in LidarrData: artistIds.append(artist_to_add.get('id')) 
-	if foreignArtistId not in artistIds:
-		data = json.dumps({
-			"artistName" : artistName ,
-			"foreignArtistId" : foreignArtistId,
-			"QualityProfileId" : 1,
-			"MetadataProfileId" : 1,
-			"Path": os.path.join(rootfolderpath,artistName) ,
-			"albumFolder": True ,
-			"RootFolderPath" : rootfolderpath,
-			"monitored": True,
-			"addOptions": {"searchForMissingAlbums" : False}
-			})
-		url = '{}/api/v1/artist'.format(baseurl)
-		headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
-		rsp = requests.post(url, headers=headers, data=data)
-		if rsp.status_code == 201:
-			artist_added_count +=1
-			log.info("{} Added to Lidarr :)".format(artistName))
-		elif rsp.status_code == 400:
-			artist_exist_count +=1
-			log.info("{} already Exists in Lidarr.".format(artistName))
-			return
-		else:
-			log.error("{} Not found, Not added to Lidarr.".format(artistName))
-			log.error("URL -> {} Status Code -> {}".format(url,rsp.status_code))
-			return
-	else:
-		artist_exist_count +=1
-		log.info("{} already Exists in Lidarr.".format(artistName))
-		return
+def add_artist(artist_name: str, foreign_artist_id: str, session: requests.Session) -> None:
+    """Add an artist to Lidarr if it does not already exist."""
 
-def get_artist_id(artist):
-	url = 'https://api.lidarr.audio/api/v0.4/search?type=artist&query="{}"'.format(artist)
-	headers = {"Content-type": "application/json", "X-Api-Key": "{}".format(api_key)}
-	rsp = requests.get(url, headers=headers)
-	
-	if rsp.text =="[]":	
-		log.error("Sorry. We couldn't find {}".format(artist))
-		fo = open("not_found.txt", "a+")
-		fo.write("{}\n".format(artist))
-		fo.close
-		return None
-	
-	d = json.loads(rsp.text)
-	if rsp.status_code == 200: 
-		try: return d[0]['id']
-		except Exception as e: return d['id']
-	else: 
-		return None
+    global artist_exist_count, artist_added_count
 
-def main():
-	# print('\033c')
-	global artist_exist_count
-	global LidarrData
+    existing_ids = [artist.get("id") for artist in LidarrData]
+    if foreign_artist_id in existing_ids:
+        artist_exist_count += 1
+        log.info(f"{artist_name} already exists in Lidarr.")
+        return
 
-	if sys.version_info[0] < 3: log.error("Must be using Python 3"); sys.exit(-1)
-	if len(sys.argv)<2: log.error("No list Specified... Bye!!"); sys.exit(-1)
-	if not os.path.exists(sys.argv[1]): log.info("{} Does Not Exist".format(sys.argv[1]));sys.exit(-1)
-	log.info("Downloading Lidarr Artist Data. :)")
-	headers = {"Content-type": "application/json", "X-Api-Key": api_key }
-	url = "{}/api/v1/artist".format(baseurl)
-	rsp = requests.get(url , headers=headers)
-	if rsp.status_code == 200:
-		LidarrData = json.loads(rsp.text)
-	elif rsp.status_code == 401:
-		log.error("Failed to connect to Lidarr Unauthorized. Check api_key in config."); sys.exit(-1)
-	else:
-		log.error("URL -> {} Status Code -> {}".format(url,rsp.status_code))
-		log.error("Failed to connect to Lidarr..."); sys.exit(-1)
+    payload = json.dumps({
+        "artistName": artist_name,
+        "foreignArtistId": foreign_artist_id,
+        "QualityProfileId": 1,
+        "MetadataProfileId": 1,
+        "Path": os.path.join(rootfolderpath, artist_name),
+        "albumFolder": True,
+        "RootFolderPath": rootfolderpath,
+        "monitored": True,
+        "addOptions": {"searchForMissingAlbums": False},
+    })
+    url = f"{baseurl}/api/v1/artist"
+    headers = {"Content-type": "application/json", "X-Api-Key": api_key}
+    rsp = session.post(url, headers=headers, data=payload)
+    if rsp.status_code == 201:
+        artist_added_count += 1
+        log.info(f"{artist_name} added to Lidarr :)")
+    elif rsp.status_code == 400:
+        artist_exist_count += 1
+        log.info(f"{artist_name} already exists in Lidarr.")
+    else:
+        log.error(f"{artist_name} not found. Status: {rsp.status_code}")
 
-	with open(sys.argv[1], encoding="utf8") as csvfile: total_count = len(list(csv.DictReader(csvfile)))
-	with open(sys.argv[1]) as csvfile:
-		m = csv.DictReader(csvfile)
-		if not total_count>0: log.error("No Artists Found in file... Bye!!"); sys.exit()
-		log.info("Found {} Artists in {}. :)".format(total_count,sys.argv[1]))
-		for row in m:
-			if not (row): continue
-			try: row['artist']
-			except: log.error("Invalid CSV File, Header does not contain artist header."); sys.exit(-1)
-			artist  = row['artist']; foreignArtistId = row['foreignArtistId']
-			if foreignArtistId == None: foreignArtistId = get_artist_id(artist)
-			if foreignArtistId == None: continue
-			try: add_artist(artist, foreignArtistId)
-			except Exception as e: log.error(e); sys.exit(-1)
-	log.info("Added {} of {} Artists, {} Already Exist".format(artist_added_count,total_count,artist_exist_count))
+def get_artist_id(artist: str, session: requests.Session) -> str | None:
+    """Query Lidarr's search API to resolve an artist's MBID."""
+
+    url = f"https://api.lidarr.audio/api/v0.4/search?type=artist&query=\"{artist}\""
+    headers = {"Content-type": "application/json", "X-Api-Key": api_key}
+    rsp = session.get(url, headers=headers)
+
+    if rsp.text == "[]":
+        log.error(f"Sorry. We couldn't find {artist}")
+        with open("not_found.txt", "a+", encoding="utf-8") as fo:
+            fo.write(f"{artist}\n")
+        return None
+
+    data = json.loads(rsp.text)
+    if rsp.status_code == 200:
+        try:
+            return data[0]["id"]
+        except Exception:
+            return data.get("id")
+    return None
+
+def main() -> None:
+    """Entry point for the script."""
+
+    global LidarrData
+
+    if sys.version_info[0] < 3:
+        log.error("Must be using Python 3")
+        sys.exit(-1)
+    if len(sys.argv) < 2:
+        log.error("No list specified... bye!!")
+        sys.exit(-1)
+    if not os.path.exists(sys.argv[1]):
+        log.error(f"{sys.argv[1]} does not exist")
+        sys.exit(-1)
+
+    session = requests.Session()
+    adapter = requests.adapters.HTTPAdapter(max_retries=5)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+
+    log.info("Downloading Lidarr artist data...")
+    headers = {"Content-type": "application/json", "X-Api-Key": api_key}
+    url = f"{baseurl}/api/v1/artist"
+    rsp = session.get(url, headers=headers)
+    if rsp.status_code == 200:
+        LidarrData = json.loads(rsp.text)
+    elif rsp.status_code == 401:
+        log.error("Failed to connect to Lidarr - unauthorized. Check API key in config.")
+        sys.exit(-1)
+    else:
+        log.error(f"URL -> {url} Status Code -> {rsp.status_code}")
+        log.error("Failed to connect to Lidarr...")
+        sys.exit(-1)
+
+    with open(sys.argv[1], encoding="utf-8") as csvfile:
+        rows = list(csv.DictReader(csvfile))
+    total_count = len(rows)
+    if total_count == 0:
+        log.error("No artists found in file... bye!!")
+        sys.exit(0)
+    if rows and "artist" not in rows[0]:
+        log.error("Invalid CSV file - header must contain artist and foreignArtistId")
+        sys.exit(-1)
+    log.info(f"Found {total_count} artists in {sys.argv[1]} :)")
+
+    for row in rows:
+        artist = row.get("artist")
+        foreign_artist_id = row.get("foreignArtistId")
+        if not artist:
+            continue
+        if not foreign_artist_id:
+            foreign_artist_id = get_artist_id(artist, session)
+        if not foreign_artist_id:
+            continue
+        try:
+            add_artist(artist, foreign_artist_id, session)
+        except Exception as err:
+            log.error(err)
+            sys.exit(-1)
+
+    log.info(
+        f"Added {artist_added_count} of {total_count} artists, {artist_exist_count} already exist"
+    )
 
 if __name__ == "__main__":
-	main()
+    main()
