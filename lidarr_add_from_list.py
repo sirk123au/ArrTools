@@ -76,14 +76,7 @@ def create_session() -> requests.Session:
 def add_artist(artist_name: str, foreign_artist_id: str, session: requests.Session) -> None:
     """Add an artist to Lidarr if it does not already exist."""
 
-    global artist_exist_count, artist_added_count
-
-    existing_ids = [artist.get("id") for artist in LidarrData]
-    if foreign_artist_id in existing_ids:
-        artist_exist_count += 1
-        log.info(f"{artist_name} already exists in Lidarr.")
-        return
-
+    
     payload = {
         "artistName": artist_name,
         "foreignArtistId": foreign_artist_id,
@@ -171,7 +164,7 @@ def lookup_musicbrainz(artist: str, session: requests.Session) -> str | None:
 def main() -> None:
     """Entry point for the script."""
 
-    global LidarrData
+    global LidarrData, artist_exist_count, artist_added_count
 
     if sys.version_info[0] < 3:
         log.error("Must be using Python 3")
@@ -185,7 +178,7 @@ def main() -> None:
 
     session = create_session()
 
-    log.info("Downloading Lidarr artist data...")
+    log.info("Downloading Lidarr data...")
     headers = {"Content-type": "application/json", "X-Api-Key": api_key}
     url = f"{baseurl}/api/v1/artist"
     try:
@@ -226,7 +219,12 @@ def main() -> None:
         if not foreign_artist_id:
             continue
         try:
-            add_artist(artist, foreign_artist_id, session)
+            existing_ids = [artist.get("foreignArtistId") for artist in LidarrData]
+            if foreign_artist_id in existing_ids:
+                artist_exist_count += 1
+                log.info(f"{artist} already exists in Lidarr Data.")
+            else:
+                add_artist(artist, foreign_artist_id, session)
         except Exception as err:
             log.error(err)
             sys.exit(-1)
